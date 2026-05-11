@@ -200,3 +200,16 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://back.psbsmartedu.ru',
+    'https://www.back.psbsmartedu.ru',  # если есть www
+]
+
+# Если админка работает через прокси (nginx, Apache), возможно понадобится:
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+
+# Для HTTPS обязательно установите:
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
