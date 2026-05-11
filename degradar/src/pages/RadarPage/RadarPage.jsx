@@ -22,9 +22,26 @@ export default function RadarPage() {
     setIsAnalyzing(true)
     setTimeout(() => {
       setIsAnalyzing(false)
+      // Имитация анализа текста — в реальности здесь будет запрос к LLM
+      const detectedZones = [
+        { id: 'gdpr', name: 'GDPR / Защита данных', level: 'high', color: '#ea580c', description: 'Обработка персональных данных' },
+        { id: 'aml', name: 'AML / Отмывание денег', level: 'critical', color: '#dc2626', description: 'Риски подозрительных операций' },
+      ]
+      
       setAnalysisResult({
         ...mockAnalysisResult,
-        summary: `Анализ завершён. Детекция выявила критические риски в зонах Data Privacy и AML. Рекомендую немедленно обновить DPIA.`,
+        summary: `Анализ завершён. Выявлены критические риски в зонах "Защита данных" и "AML". Требуется обновление политик.`,
+        detectionZones: detectedZones,
+        ownerTasks: [
+          { id: 1, label: 'Согласовать текст согласия на обработку данных', done: false },
+          { id: 2, label: 'Определить сроки хранения данных (GDPR Art. 5)', done: false },
+          { id: 3, label: 'Подготовить UX для запроса согласия', done: false },
+        ],
+        complianceTasks: [
+          { id: 1, label: 'Обновить паттерны мониторинга AML', done: false },
+          { id: 2, label: 'Проверить соответствие SCA (PSD2)', done: false },
+          { id: 3, label: 'Провести оценку DPIA (GDPR Art. 35)', done: false },
+        ],
       })
     }, 1800)
   }

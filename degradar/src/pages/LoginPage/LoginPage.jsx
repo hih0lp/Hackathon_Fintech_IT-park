@@ -21,7 +21,7 @@ export default function LoginPage() {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!formData.email || !formData.password) {
-      setError('Please fill in all fields')
+      setError('Заполните все поля')
       return
     }
     // Simulate login - replace with actual API call
@@ -44,8 +44,8 @@ export default function LoginPage() {
         </div>
 
         <div className={styles.card}>
-          <h1 className={styles.title}>Sign In</h1>
-          <p className={styles.subtitle}>Welcome back to compliance intelligence</p>
+          <h1 className={styles.title}>Вход</h1>
+          <p className={styles.subtitle}>Добро пожаловать в REGRADAR</p>
 
           {error && <div className={styles.error}>{error}</div>}
 
@@ -58,20 +58,20 @@ export default function LoginPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="your@email.com"
+                placeholder="ваш@email.com"
                 className={styles.input}
               />
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="password" className={styles.label}>Password</label>
+              <label htmlFor="password" className={styles.label}>Пароль</label>
               <input
                 type="password"
                 id="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Enter your password"
+                placeholder="Введите пароль"
                 className={styles.input}
               />
             </div>
@@ -79,26 +79,26 @@ export default function LoginPage() {
             <div className={styles.options}>
               <label className={styles.remember}>
                 <input type="checkbox" className={styles.checkbox} />
-                <span>Remember me</span>
+                <span>Запомнить меня</span>
               </label>
-              <Link to="/forgot-password" className={styles.forgot}>Forgot password?</Link>
+              <Link to="/forgot-password" className={styles.forgot}>Забыли пароль?</Link>
             </div>
 
             <button type="submit" className={styles.submit}>
-              Sign In
+              Войти
             </button>
           </form>
 
           <p className={styles.footer}>
-            Don't have an account?{' '}
-            <Link to="/register" className={styles.link}>Sign up</Link>
+            Нет аккаунта?{' '}
+            <Link to="/register" className={styles.link}>Зарегистрироваться</Link>
           </p>
         </div>
 
         <p className={styles.terms}>
-          By signing in, you agree to our{' '}
-          <Link to="/terms">Terms of Service</Link> and{' '}
-          <Link to="/privacy">Privacy Policy</Link>
+          Входя в аккаунт, вы соглашаетесь с{' '}
+          <Link to="/terms">Условиями использования</Link> и{' '}
+          <Link to="/privacy">Политикой конфиденциальности</Link>
         </p>
       </div>
     </div>

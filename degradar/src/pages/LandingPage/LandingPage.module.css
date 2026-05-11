@@ -31,9 +31,9 @@
 
 /* ---------- Nav ---------- */
 .nav {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
     padding: 10px 32px;
     height: 64px;
     background: rgba(255, 255, 255, 0.95);
@@ -53,6 +53,14 @@
     font-size: 1.25rem;
     letter-spacing: 0.02em;
     color: var(--text-primary);
+    justify-self: start;
+}
+
+.navActions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-self: end;
 }
 
 .navLogoIcon svg {
@@ -96,12 +104,6 @@
     transform: scaleX(1);
 }
 
-.navActions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
 .navLogin {
     color: var(--text-secondary);
     text-decoration: none;
@@ -128,6 +130,22 @@
 
 .navSignup:hover {
     background-color: #f1f5f9;
+}
+
+.navLaunch {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color var(--transition);
+}
+
+.navLaunch:hover {
+    background: var(--accent-hover);
 }
 
 .navCta {
@@ -334,6 +352,7 @@
     background: #f8fafc;
     border-top: 1px solid #e2e8f0;
     border-bottom: 1px solid #e2e8f0;
+    scroll-margin-top: 80px;
 }
 
 .tickerTrack {
@@ -371,6 +390,7 @@
     padding: 80px 24px;
     text-align: center;
     background: var(--bg-primary);
+    scroll-margin-top: 80px;
 }
 
 .sectionLabel {
@@ -590,4 +610,224 @@
         gap: 12px;
         text-align: center;
     }
+
+    .covGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        padding: 0 16px;
+    }
+
+    .aboutSteps {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .aboutArrow {
+        transform: rotate(90deg);
+    }
+
+    .aboutBuiltGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+/* ---------- Coverage Section ---------- */
+.covSection {
+    padding: 80px 24px;
+    background: var(--bg-primary);
+}
+
+.covHeader {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.covTitle {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0 0 12px;
+    color: var(--text-primary);
+}
+
+.covSubtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.covGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.covCard {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    text-align: left;
+    transition: border-color var(--transition);
+}
+
+.covCard:hover {
+    border-color: var(--text-muted);
+}
+
+.covIcon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    color: var(--accent);
+}
+
+.covName {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 6px;
+    color: var(--text-primary);
+}
+
+.covDesc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0 0 12px;
+    line-height: 1.4;
+}
+
+.covBadge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* ---------- About Section ---------- */
+.aboutSection {
+    padding: 80px 24px;
+    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    text-align: center;
+    scroll-margin-top: 80px;
+}
+
+.aboutHeader {
+    margin-bottom: 48px;
+}
+
+.aboutTitle {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.aboutSteps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    max-width: 900px;
+    margin: 0 auto 48px;
+}
+
+.aboutStep {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.aboutStepNum {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 50%;
+}
+
+.aboutStepIcon {
+    color: var(--text-secondary);
+}
+
+.aboutStepText {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    margin: 0;
+}
+
+.aboutArrow {
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.aboutBuilt {
+    margin-bottom: 40px;
+}
+
+.aboutBuiltLabel {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 24px;
+}
+
+.aboutBuiltGrid {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    flex-wrap: wrap;
+}
+
+.aboutBuiltItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.aboutBuiltIcon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    color: var(--accent);
+}
+
+.aboutCta {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color var(--transition);
+}
+
+.aboutCta:hover {
+    background: var(--accent-hover);
 }

@@ -23,15 +23,15 @@ export default function RegisterPage() {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!formData.name || !formData.email || !formData.password) {
-      setError('Please fill in all required fields')
+      setError('Заполните все обязательные поля')
       return
     }
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
+      setError('Пароли не совпадают')
       return
     }
     if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters')
+      setError('Пароль должен быть не менее 8 символов')
       return
     }
     // Simulate registration - replace with actual API call
@@ -54,21 +54,21 @@ export default function RegisterPage() {
         </div>
 
         <div className={styles.card}>
-          <h1 className={styles.title}>Create Account</h1>
-          <p className={styles.subtitle}>Start your compliance journey today</p>
+          <h1 className={styles.title}>Создать аккаунт</h1>
+          <p className={styles.subtitle}>Начните путь к соответствию регуляторным требованиям</p>
 
           {error && <div className={styles.error}>{error}</div>}
 
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.field}>
-              <label htmlFor="name" className={styles.label}>Full Name</label>
+              <label htmlFor="name" className={styles.label}>ФИО</label>
               <input
                 type="text"
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="John Doe"
+                placeholder="Иван Иванов"
                 className={styles.input}
               />
             </div>
@@ -81,52 +81,52 @@ export default function RegisterPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="your@email.com"
+                placeholder="ваш@email.com"
                 className={styles.input}
               />
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="password" className={styles.label}>Password</label>
+              <label htmlFor="password" className={styles.label}>Пароль</label>
               <input
                 type="password"
                 id="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Create a password"
+                placeholder="Придумайте пароль"
                 className={styles.input}
               />
-              <span className={styles.hint}>Must be at least 8 characters</span>
+              <span className={styles.hint}>Минимум 8 символов</span>
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="confirmPassword" className={styles.label}>Confirm Password</label>
+              <label htmlFor="confirmPassword" className={styles.label}>Подтвердите пароль</label>
               <input
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                placeholder="Confirm your password"
+                placeholder="Повторите пароль"
                 className={styles.input}
               />
             </div>
 
             <label className={styles.termsCheck}>
               <input type="checkbox" className={styles.checkbox} required />
-              <span>I agree to the <Link to="/terms" className={styles.link}>Terms of Service</Link> and{' '}
-                <Link to="/privacy" className={styles.link}>Privacy Policy</Link></span>
+              <span>Я согласен с <Link to="/terms" className={styles.link}>Условиями использования</Link> и{' '}
+                <Link to="/privacy" className={styles.link}>Политикой конфиденциальности</Link></span>
             </label>
 
             <button type="submit" className={styles.submit}>
-              Create Account
+              Создать аккаунт
             </button>
           </form>
 
           <p className={styles.footer}>
-            Already have an account?{' '}
-            <Link to="/login" className={styles.link}>Sign in</Link>
+            Уже есть аккаунт?{' '}
+            <Link to="/login" className={styles.link}>Войти</Link>
           </p>
         </div>
       </div>

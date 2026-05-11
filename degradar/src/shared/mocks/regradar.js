@@ -66,17 +66,36 @@ export const mockRadarItems = [
 ]
 
 export const mockAnalysisResult = {
-  summary: 'Анализ завершён. Детекция выявила критические риски в зонах Data Privacy и AML. Рекомендую немедленно обновить DPIA.',
+  summary: 'Анализ завершён. Выявлены критические риски в зонах Обработка персональных данных и AML. Требуется обновление DPIA и политики конфиденциальности.',
   criticalTerms: ['критические риски'],
+  detectionZones: [
+    { id: 'gdpr', name: 'GDPR / Защита данных', level: 'high', color: '#ea580c', description: 'Обработка персональных данных при P2P-переводах' },
+    { id: 'aml', name: 'AML / Отмывание денег', level: 'critical', color: '#dc2626', description: 'Мониторинг подозрительных транзакций' },
+    { id: 'kyc', name: 'KYC / Идентификация', level: 'medium', color: '#d97706', description: 'Верификация пользователей' },
+    { id: 'psd2', name: 'PSD2 / Платежи', level: 'medium', color: '#2563eb', description: 'Сильная аутентификация клиентов (SCA)' },
+  ],
   ownerTasks: [
-    { id: 1, label: 'Draft Consent Flow for P2P sharing', done: false },
-    { id: 2, label: 'Define Data Retention period (GDPR)', done: false },
+    { id: 1, label: 'Согласовать текст согласия на обработку данных для P2P-шаринга', done: false },
+    { id: 2, label: 'Определить сроки хранения данных (GDPR Art. 5)', done: false },
+    { id: 3, label: 'Подготовить UX для запроса дополнительного согласия', done: false },
   ],
   complianceTasks: [
-    { id: 1, label: 'Update AML Monitoring Patterns', done: false },
-    { id: 2, label: 'Verify PSD3 API Security compliance', done: false },
+    { id: 1, label: 'Обновить паттерны мониторинга AML для P2P-транзакций', done: false },
+    { id: 2, label: 'Проверить соответствие требованиям SCA (PSD2)', done: false },
+    { id: 3, label: 'Провести оценку рисков DPIA (GDPR Art. 35)', done: false },
   ],
-  tags: ['Privacy Policy Update', 'Regulation (EU) 2024/1689'],
+  recommendations: [
+    { id: 1, document: 'Политика конфиденциальности', action: 'Обновить', reason: 'Новый способ обработки данных', priority: 'high' },
+    { id: 2, document: 'Пользовательское соглашение', action: 'Дополнить', reason: 'Условия P2P-переводов', priority: 'high' },
+    { id: 3, document: 'Политика AML/KYC', action: 'Пересмотреть', reason: 'Новые риски отмывания', priority: 'critical' },
+    { id: 4, document: 'Регламент инцидентов', action: 'Актуализировать', reason: 'Процедуры уведомлений', priority: 'medium' },
+  ],
+  proofs: [
+    { id: 1, law: 'GDPR Art. 6(1)(a)', description: 'Правовое основание обработки — согласие', link: 'https://gdpr-info.eu/art-6-gdpr/' },
+    { id: 2, law: 'GDPR Art. 35', description: 'Обязательность DPIA для высокорисковой обработки', link: 'https://gdpr-info.eu/art-35-gdpr/' },
+    { id: 3, law: 'Directive (EU) 2015/849', description: 'Требования к AML для платежных систем', link: '#' },
+  ],
+  tags: ['Обновление политик', 'DPIA', 'P2P-переводы'],
 }
 
 export const mockMessages = [

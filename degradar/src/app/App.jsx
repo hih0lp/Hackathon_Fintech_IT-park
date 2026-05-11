@@ -3,7 +3,8 @@ import LandingPage from '../pages/LandingPage/LandingPage.jsx'
 import LoginPage from '../pages/LoginPage/LoginPage.jsx'
 import RegisterPage from '../pages/RegisterPage/RegisterPage.jsx'
 import VerificationPage from '../pages/VerificationPage/VerificationPage.jsx'
-// import RadarPage from '../pages/RadarPage/RadarPage.jsx'
+import ProjectsPage from '../pages/ProjectsPage/ProjectsPage.jsx'
+import RadarPage from '../pages/RadarPage/RadarPage.jsx'
 
 export default function App() {
   return (
@@ -13,6 +14,8 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/verify" element={<VerificationPage />} />
+        <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/radar" element={<RadarPage />} />
       </Routes>
     </BrowserRouter>
   )

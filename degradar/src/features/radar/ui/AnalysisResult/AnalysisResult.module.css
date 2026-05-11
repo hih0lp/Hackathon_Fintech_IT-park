@@ -16,8 +16,8 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: var(--accent-blue-glow);
-  border: 1px solid rgba(91, 110, 245, 0.3);
+  background: rgba(34, 77, 71, 0.1);
+  border: 1px solid rgba(34, 77, 71, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,8 +97,8 @@
 }
 
 .checked {
-  background: var(--accent-blue);
-  border-color: var(--accent-blue);
+  background: #224d47;
+  border-color: #224d47;
 }
 
 .taskLabel {
@@ -132,6 +132,169 @@
 }
 
 .tag:hover {
-  border-color: var(--accent-blue);
+  border-color: #224d47;
   color: var(--text-primary);
+}
+
+/* New Sections */
+.section {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.toggleProofs {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #224d47;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.toggleProofs:hover {
+  text-decoration: underline;
+}
+
+/* Detection Zones */
+.zonesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 14px 14px;
+}
+
+.zoneCard {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.zoneHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.zoneName {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.zoneLevel {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.zoneDesc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Recommendations */
+.recommendations {
+  padding: 0 14px 14px;
+}
+
+.recCard {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.recCard:last-child {
+  margin-bottom: 0;
+}
+
+.recHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.recDoc {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.recAction {
+  font-size: 10px;
+  color: #224d47;
+  font-weight: 500;
+}
+
+.recReason {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 0 0 6px;
+  line-height: 1.4;
+}
+
+.recPriority {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* Proofs */
+.proofs {
+  padding: 0 14px 14px;
+}
+
+.proofCard {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.proofCard:last-child {
+  margin-bottom: 0;
+}
+
+.proofLaw {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #224d47;
+  text-decoration: none;
+  margin-bottom: 4px;
+}
+
+.proofLaw:hover {
+  text-decoration: underline;
+}
+
+.proofDesc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
 }

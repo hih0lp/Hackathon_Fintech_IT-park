@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import styles from './LandingPage.module.css'
 
 const features = [
@@ -11,7 +11,7 @@ const features = [
         <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
       </svg>
     ),
-    title: 'Real-Time Radar',
+    title: 'Радар в реальном времени',
     desc: 'Мгновенное сканирование фич на соответствие GDPR, AML, PSD2 и другим регуляторным фреймворкам.',
   },
   {
@@ -21,7 +21,7 @@ const features = [
         <path d="M12 9v5M12 16v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
       </svg>
     ),
-    title: 'Critical Risk Detection',
+    title: 'Выявление критических рисков',
     desc: 'Автоматическое выявление критических зон в описании продуктовых фич до начала разработки.',
   },
   {
@@ -31,8 +31,8 @@ const features = [
         <path d="M8 12l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
-    title: 'Compliance Action Plan',
-    desc: 'Конкретные задачи для Product Owner и команды compliance — прямо из описания фичи.',
+    title: 'План действий по нормативному соответствию',
+    desc: 'Конкретные задачи для Product Owner и команд юристов — прямо из описания фичи.',
   },
   {
     icon: (
@@ -41,96 +41,114 @@ const features = [
         <path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
-    title: 'Jira Sync',
-    desc: 'Одна кнопка — все задачи в Jira. Интеграция с вашим workflow без лишних шагов.',
+    title: 'Синхронизация с Jira',
+    desc: 'Одна кнопка — все задачи в Jira. Интеграция с вашей рабочей зоной без лишних шагов.',
   },
 ]
 
-const regulations = ['KYC', 'AML', 'GDPR / PRIVACY', 'AI ACT', 'PSD2 / PSD3', 'OPEN BANKING', 'DPIA', 'ISO 27001']
+const regulations = ['KYC', 'AML', 'GDPR / КОНФИДЕНЦИАЛЬНОСТЬ', 'AI ACT', 'PSD2 / PSD3', 'ОТКРЫТЫЙ БАНКИНГ', 'DPIA', 'ISO 27001']
 
 export default function LandingPage({ onStart }) {
+  const navigate = useNavigate()
+  const isLoggedIn = false // Фиксированный режим: пользователь вошёл в аккаунт
+
+  const handleStart = () => {
+    if (isLoggedIn) {
+      navigate('/radar')
+    } else {
+      navigate('/register')
+    }
+  }
+
   return (
     <div className={styles.root}>
-      {/* NAV */}
+      {/* НАВИГАЦИЯ */}
       <header className={styles.nav}>
         <div className={styles.navLogo}>
           <div className={styles.navLogoIcon}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="#5b6ef5" strokeWidth="1.5"/>
-              <circle cx="12" cy="12" r="5" stroke="#5b6ef5" strokeWidth="1.5" strokeDasharray="2 2"/>
-              <circle cx="12" cy="12" r="1.5" fill="#5b6ef5"/>
+              <circle cx="12" cy="12" r="10" stroke="#224d47" strokeWidth="1.5"/>
+              <circle cx="12" cy="12" r="5" stroke="#224d47" strokeWidth="1.5" strokeDasharray="2 2"/>
+              <circle cx="12" cy="12" r="1.5" fill="#224d47"/>
             </svg>
           </div>
           <span>REGRADAR</span>
         </div>
         <nav className={styles.navLinks}>
-          <a href="#features">Features</a>
-          <a href="#regulations">Coverage</a>
-          <a href="#about">About</a>
+          <a href="#regulations">Покрытие</a>
+          <a href="#features">Возможности</a>
+          <a href="#about">О продукте</a>
         </nav>
         <div className={styles.navActions}>
-          <Link to="/login" className={styles.navLogin}>Log In</Link>
-          <Link to="/register" className={styles.navSignup}>Sign Up</Link>
-          <button className={styles.navCta} onClick={onStart}>
-            Launch App →
-          </button>
+          {isLoggedIn ? (
+            <button className={styles.navLaunch} onClick={handleStart}>
+              Запустить
+            </button>
+          ) : (
+            <>
+              <Link to="/login" className={styles.navLogin}>Войти</Link>
+              <Link to="/register" className={styles.navSignup}>Регистрация</Link>
+            </>
+          )}
         </div>
       </header>
 
-      {/* HERO */}
+      {/* ГЕРОЙ */}
       <section className={styles.hero}>
         <div className={styles.heroBadge}>
           <span className={styles.heroLiveDot} />
-          Real-time compliance intelligence
+          Аналитика соответствия в реальном времени
         </div>
         <h1 className={styles.heroTitle}>
-          Ship features.<br />
-          <span className={styles.heroGradient}>Stay compliant.</span>
+          Запускайте фичи.<br />
+          <span className={styles.heroGradient}>Оставайтесь без рисков.</span>
         </h1>
         <p className={styles.heroSub}>
           REGRADAR анализирует новые фичи на регуляторные риски в реальном времени —
           AML, GDPR, PSD2, AI ACT и другие, прямо из описания вашей задачи.
         </p>
         <div className={styles.heroActions}>
-          <button className={styles.heroPrimary} onClick={onStart}>
+          <button className={styles.heroPrimary} onClick={handleStart}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
               <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2 2"/>
               <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
             </svg>
-            Initialize Radar
+            {isLoggedIn ? 'Запустить радар' : 'Начать'}
           </button>
           <button className={styles.heroSecondary}>
-            Watch Demo
+            Смотреть демо
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
               <polygon points="10,8 16,12 10,16" fill="currentColor"/>
             </svg>
           </button>
-          <a href="/register" className={styles.heroRegister}>
-            Sign Up
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <polyline points="10,17 15,12 10,7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <line x1="15" y1="12" x2="3" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </a>
+          {!isLoggedIn && (
+            <Link to="/register" className={styles.heroRegister}>
+              Регистрация
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <polyline points="10,17 15,12 10,7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="15" y1="12" x2="3" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </Link>
+          )}
         </div>
 
-        {/* Floating radar metrics preview */}
+        {/* Превью метрик радара */}
         <div className={styles.heroPreview}>
           <div className={styles.previewCard}>
             <div className={styles.previewHeader}>
               <span className={styles.previewDot} />
-              <span>RADAR STATUS — SCANNING...</span>
+              <span>СТАТУС РАДАРА — СКАНИРОВАНИЕ...</span>
             </div>
             <div className={styles.previewItems}>
               {[
-                { label: 'KYC', status: 'MEDIUM', color: '#d97706' },
-                { label: 'AML', status: 'CRITICAL', color: '#dc2626' },
-                { label: 'GDPR', status: 'HIGH', color: '#ea6c0a' },
-                { label: 'PSD2', status: 'MODERATE', color: '#2563eb' },
-                { label: 'OPEN BANKING', status: 'SAFE', color: '#059669' },
+                { label: 'KYC', status: 'СРЕДНИЙ', color: '#d97706' },
+                { label: 'AML', status: 'КРИТИЧЕСКИЙ', color: '#dc2626' },
+                { label: 'GDPR', status: 'ВЫСОКИЙ', color: '#ea6c0a' },
+                { label: 'PSD2', status: 'УМЕРЕННЫЙ', color: '#2563eb' },
+                { label: 'ОТКРЫТЫЙ БАНКИНГ', status: 'БЕЗОПАСНО', color: '#059669' },
               ].map(item => (
                 <div key={item.label} className={styles.previewItem}>
                   <span className={styles.previewLabel}>{item.label}</span>
@@ -144,7 +162,7 @@ export default function LandingPage({ onStart }) {
         </div>
       </section>
 
-      {/* REGULATIONS TICKER */}
+      {/* БЕГУЩАЯ СТРОКА РЕГУЛИРОВАНИЙ */}
       <div className={styles.ticker} id="regulations">
         <div className={styles.tickerTrack}>
           {[...regulations, ...regulations, ...regulations].map((reg, i) => (
@@ -153,10 +171,47 @@ export default function LandingPage({ onStart }) {
         </div>
       </div>
 
-      {/* FEATURES */}
+      {/* ПОКРЫТИЕ (Закомментировано)
+      <section className={styles.covSection}>
+        <div className={styles.covHeader}>
+          <h2 className={styles.covTitle}>Покрытие регулирований</h2>
+          <p className={styles.covSubtitle}>Мы покрываем 15+ регуляторных фреймворков</p>
+        </div>
+        <div className={styles.covGrid}>
+          {[
+            { name: 'KYC', desc: 'Комплаенс "Знай своего клиента"', level: 'Полное', color: '#059669' },
+            { name: 'AML', desc: 'Стандарты по борьбе с отмыванием денег', level: 'Полное', color: '#059669' },
+            { name: 'GDPR', desc: 'Европейский регламент по защите данных', level: 'Полное', color: '#059669' },
+            { name: 'AI Act', desc: 'Европейские правила в сфере ИИ', level: 'Частичное', color: '#d97706' },
+            { name: 'PSD2/PSD3', desc: 'Директива о платежных услугах', level: 'Полное', color: '#059669' },
+            { name: 'Открытый банкинг', desc: 'API для обмена финансовыми данными', level: 'Полное', color: '#059669' },
+            { name: 'DPIA', desc: 'Оценка воздействия на защиту данных', level: 'Полное', color: '#059669' },
+            { name: 'ISO 27001', desc: 'Управление информационной безопасностью', level: 'Частичное', color: '#d97706' },
+            { name: 'Предотвращение мошенничества', desc: 'Мониторинг транзакций', level: 'Полное', color: '#059669' },
+            { name: 'Кредитный скоринг', desc: 'Комплаенс справедливого кредитования', level: 'Частичное', color: '#d97706' },
+            { name: 'Крипто/DeFi', desc: 'Регулирование цифровых активов', level: 'Частичное', color: '#d97706' },
+            { name: 'Защита потребителей', desc: 'Стандарты добросовестного отношения', level: 'Полное', color: '#059669' },
+          ].map((item) => (
+            <div key={item.name} className={styles.covCard}>
+              <div className={styles.covIcon}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </div>
+              <h3 className={styles.covName}>{item.name}</h3>
+              <p className={styles.covDesc}>{item.desc}</p>
+              <span className={styles.covBadge} style={{ background: item.color + '15', color: item.color }}>
+                {item.level}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section> */}
+
+      {/* ВОЗМОЖНОСТИ */}
       <section className={styles.features} id="features">
-        <div className={styles.sectionLabel}>WHY REGRADAR</div>
-        <h2 className={styles.sectionTitle}>Built for product teams who ship fast</h2>
+        <div className={styles.sectionLabel}>ПОЧЕМУ REGRADAR</div>
+        <h2 className={styles.sectionTitle}>Создан для продуктовых команд, которые запускаются быстро</h2>
         <div className={styles.featureGrid}>
           {features.map(f => (
             <div key={f.title} className={styles.featureCard}>
@@ -168,31 +223,111 @@ export default function LandingPage({ onStart }) {
         </div>
       </section>
 
-      {/* CTA BANNER */}
-      <section className={styles.ctaBanner} id="about">
-        <div className={styles.ctaInner}>
-          <h2 className={styles.ctaTitle}>Готовы проверить свою следующую фичу?</h2>
-          <p className={styles.ctaSub}>Запустите анализ за 30 секунд — без регистрации.</p>
-          <button className={styles.ctaBtn} onClick={onStart}>
-            Initialize Radar
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+      {/* О ПРОДУКТЕ */}
+      <section className={styles.aboutSection} id="about">
+        <div className={styles.aboutHeader}>
+          <h2 className={styles.aboutTitle}>Как это работает</h2>
         </div>
+        <div className={styles.aboutSteps}>
+          <div className={styles.aboutStep}>
+            <div className={styles.aboutStepNum}>1</div>
+            <div className={styles.aboutStepIcon}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="4" y="4" width="16" height="16" rx="2" />
+                <path d="M8 12h8M8 8h8M8 16h5" />
+              </svg>
+            </div>
+            <p className={styles.aboutStepText}>Вставьте описание фичи</p>
+          </div>
+          <div className={styles.aboutArrow}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </div>
+          <div className={styles.aboutStep}>
+            <div className={styles.aboutStepNum}>2</div>
+            <div className={styles.aboutStepIcon}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4M12 8h.01" />
+              </svg>
+            </div>
+            <p className={styles.aboutStepText}>ИИ анализирует риски</p>
+          </div>
+          <div className={styles.aboutArrow}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </div>
+          <div className={styles.aboutStep}>
+            <div className={styles.aboutStepNum}>3</div>
+            <div className={styles.aboutStepIcon}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M9 11l3 3L22 4" />
+                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+              </svg>
+            </div>
+            <p className={styles.aboutStepText}>Получите план действий и чек-лист</p>
+          </div>
+        </div>
+        <div className={styles.aboutBuilt}>
+          <p className={styles.aboutBuiltLabel}>Создано для</p>
+          <div className={styles.aboutBuiltGrid}>
+            <div className={styles.aboutBuiltItem}>
+              <div className={styles.aboutBuiltIcon}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+                </svg>
+              </div>
+              <span>Владельцев продукта</span>
+            </div>
+            <div className={styles.aboutBuiltItem}>
+              <div className={styles.aboutBuiltIcon}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </div>
+              <span>Аналитиков</span>
+            </div>
+            <div className={styles.aboutBuiltItem}>
+              <div className={styles.aboutBuiltIcon}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+              </div>
+              <span>Разработчиков</span>
+            </div>
+            <div className={styles.aboutBuiltItem}>
+              <div className={styles.aboutBuiltIcon}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <path d="M16 13H8M16 17H8M10 9H8" />
+                </svg>
+              </div>
+              <span>Юристов</span>
+            </div>
+          </div>
+        </div>
+        <button className={styles.aboutCta} onClick={handleStart}>
+          {isLoggedIn ? 'Запустить радар' : 'Начать бесплатный анализ'}
+        </button>
       </section>
 
-      {/* FOOTER */}
+      {/* ФУТЕР */}
       <footer className={styles.footer}>
         <div className={styles.footerLogo}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#5b6ef5" strokeWidth="1.5"/>
-            <circle cx="12" cy="12" r="4" stroke="#5b6ef5" strokeWidth="1.5" strokeDasharray="2 2"/>
-            <circle cx="12" cy="12" r="1.5" fill="#5b6ef5"/>
+            <circle cx="12" cy="12" r="10" stroke="#224d47" strokeWidth="1.5"/>
+            <circle cx="12" cy="12" r="4" stroke="#224d47" strokeWidth="1.5" strokeDasharray="2 2"/>
+            <circle cx="12" cy="12" r="1.5" fill="#224d47"/>
           </svg>
           REGRADAR
         </div>
-        <span className={styles.footerCopy}>© 2025 REGRADAR. Compliance Intelligence Platform.</span>
+        <span className={styles.footerCopy}>© 2025 REGRADAR. Платформа правовой аналитики.</span>
       </footer>
     </div>
   )

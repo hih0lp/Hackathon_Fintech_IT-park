@@ -51,9 +51,9 @@ export default function VerificationPage() {
     
     // Demo: accept any 6-digit code
     if (fullCode === '123456' || fullCode.length === 6) {
-      navigate('/app')
+      navigate('/projects')
     } else {
-      setError('Invalid verification code. Please try again.')
+      setError('Неверный код подтверждения. Попробуйте снова.')
       setCode(['', '', '', '', '', ''])
       inputs.current[0]?.focus()
     }
@@ -63,7 +63,7 @@ export default function VerificationPage() {
     e.preventDefault()
     const fullCode = code.join('')
     if (fullCode.length !== 6) {
-      setError('Please enter all 6 digits')
+      setError('Введите все 6 цифр')
       return
     }
     handleVerify(fullCode)
@@ -99,10 +99,10 @@ export default function VerificationPage() {
             </svg>
           </div>
 
-          <h1 className={styles.title}>Verify your email</h1>
+          <h1 className={styles.title}>Подтвердите email</h1>
           <p className={styles.subtitle}>
-            We sent a verification code to your email.<br />
-            Enter the 6-digit code below.
+            Мы отправили код подтверждения на ваш email.<br />
+            Введите 6-значный код ниже.
           </p>
 
           {error && <div className={styles.error}>{error}</div>}
@@ -126,25 +126,25 @@ export default function VerificationPage() {
             </div>
 
             <button type="submit" className={styles.submit}>
-              Verify Code
+              Подтвердить
             </button>
           </form>
 
           <div className={styles.resend}>
             {resendTimer > 0 ? (
               <span className={styles.resendText}>
-                Resend code in <strong>{resendTimer}s</strong>
+                Отправить код повторно через <strong>{resendTimer}с</strong>
               </span>
             ) : (
               <button onClick={handleResend} className={styles.resendBtn}>
-                Resend verification code
+                Отправить код повторно
               </button>
             )}
           </div>
 
           <p className={styles.footer}>
-            Wrong email?{' '}
-            <Link to="/register" className={styles.link}>Go back</Link>
+            Неверный email?{' '}
+            <Link to="/register" className={styles.link}>Назад</Link>
           </p>
         </div>
       </div>
