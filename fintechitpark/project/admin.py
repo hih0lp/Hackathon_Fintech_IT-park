@@ -12,7 +12,7 @@ class ProjectFileInline(admin.TabularInline):
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'user', 'created')
+    list_display = ('id', 'title', 'country', 'created')
     list_filter = ('created', 'user')
     search_fields = ('title', 'user__email', 'user__username')
     readonly_fields = ('created',)
