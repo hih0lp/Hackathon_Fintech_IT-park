@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT_DIR / ".env")
+load_dotenv(ROOT_DIR.parent / "agent-orchestrator-service" / ".env", override=False)
 
 
 @dataclass(frozen=True)
