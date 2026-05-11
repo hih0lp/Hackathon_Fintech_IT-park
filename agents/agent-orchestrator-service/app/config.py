@@ -16,6 +16,7 @@ load_dotenv(ROOT_DIR / ".env")
 class Settings:
     request_timeout_seconds: float
     max_parallel_workers: int
+    filter_content_agent_url: str
     ambiguity_agent_url: str
     agent_urls: dict[str, str]
 
@@ -25,6 +26,10 @@ def get_settings() -> Settings:
     return Settings(
         request_timeout_seconds=float(os.getenv("REQUEST_TIMEOUT_SECONDS", "120")),
         max_parallel_workers=int(os.getenv("MAX_PARALLEL_WORKERS", "8")),
+        filter_content_agent_url=os.getenv(
+            "FILTER_CONTENT_AGENT_URL",
+            "http://filter-content-agent:8088/v1/analyze/stream",
+        ),
         ambiguity_agent_url=os.getenv(
             "AMBIGUITY_AGENT_URL",
             "http://ambiguilty-resolver-0lvl-agent:8086/v1/analyze/stream",

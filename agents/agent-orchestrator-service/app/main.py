@@ -44,6 +44,30 @@ def orchestrate(request: AnalyzeRequest) -> StreamingResponse:
 
     def event_stream() -> Iterator[str]:
         try:
+            filter_result = call_agent_json(
+                settings.filter_content_agent_url,
+                payload,
+                settings.request_timeout_seconds,
+            )
+        except AgentCallError as exc:
+            yield _sse({"type": "error", "detail": f"Content filter failed: {exc}"})
+            return
+
+        if not isinstance(filter_result, dict):
+            yield _sse({"type": "error", "detail": "Content filter returned non-object JSON."})
+            return
+
+        filter_action = str(filter_result.get("action", "")).strip().lower()
+
+        if filter_action == "stop":
+            yield _sse({"type": "done", "result": {}})
+            return
+
+        if filter_action != "ok":
+            yield _sse({"type": "error", "detail": f"Unexpected filter action: {filter_action!r}"})
+            return
+
+        try:
             ambiguity_result = call_agent_json(
                 settings.ambiguity_agent_url,
                 payload,

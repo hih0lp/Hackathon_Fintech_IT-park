@@ -115,6 +115,8 @@ Format each item concisely:
 N) [Short title] — [1-2 sentence description of the problem and what to do]. [Regulation reference].
 ```
 
+Scores are used only for internal filtering and sorting — never include scores or any internal metadata in the output.
+
 ### Step 7 — Research & Generate Tasks
 Based on `msg` and `context`, research the feature area and generate short actionable improvement suggestions related to Data Protection & Privacy. These are not vulnerabilities — they are things the team *should do* to improve privacy posture, even if not critical blockers.
 

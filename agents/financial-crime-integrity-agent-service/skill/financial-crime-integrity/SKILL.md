@@ -197,4 +197,4 @@ Language matches `msg`. No IDs, no scores, no explanations — just the suggesti
 - **Be concise**: each item in `spec` is one sentence. No preamble, no conclusions.
 - **Be specific**: reference exact regulation articles where relevant.
 - **No hallucination**: omit uncertain references rather than guess.
-- All internal reasoning (sub-domain analysis, scoring, regulatory mapping) happens silently — output only the final JSON.
+- All internal reasoning (sub-domain analysis, scoring, regulatory mapping) happens silently — output only the final JSON. Scores and any other internal metadata must never appear in the output.

@@ -9,6 +9,7 @@ services:
     ports:
       - "8090:8090"
     depends_on:
+      - filter-content-agent
       - ambiguilty-resolver-0lvl-agent
       - financial-crime-integrity-agent
       - data-protection-agent
@@ -16,6 +17,17 @@ services:
       - consumer-protection-agent
       - ai-governance-analyst-v3-agent
       - crypto-domain-analyzer-agent
+    restart: unless-stopped
+
+  filter-content-agent:
+    build:
+      context: ../filter-content-agent
+      dockerfile: Dockerfile
+    container_name: filter-content-agent
+    env_file:
+      - ../filter-content-agent/.env
+    expose:
+      - "8088"
     restart: unless-stopped
 
   ambiguilty-resolver-0lvl-agent:
