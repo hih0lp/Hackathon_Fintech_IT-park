@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
 
-from .anthropic_client import build_anthropic_payload, stream_anthropic
+from .anthropic_client import stream_anthropic_events
 from .config import get_settings
 from .schemas import AnalyzeRequest
 from .skill_loader import load_skill_prompt
@@ -40,9 +40,8 @@ async def analyze_stream(request: AnalyzeRequest) -> StreamingResponse:
             detail="ANTHROPIC_API_KEY is not configured.",
         )
 
-    payload = build_anthropic_payload(request, settings, system_prompt)
     return StreamingResponse(
-        stream_anthropic(payload, settings),
+        stream_anthropic_events(request, settings, system_prompt),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",

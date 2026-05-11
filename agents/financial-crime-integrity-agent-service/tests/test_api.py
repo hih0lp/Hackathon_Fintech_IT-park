@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import json
+from dataclasses import replace
+
 from fastapi.testclient import TestClient
 
-from app.anthropic_client import build_anthropic_payload
+from app.anthropic_client import build_user_payload
 from app.config import get_settings
 from app.main import app
 from app.schemas import AnalyzeRequest
@@ -19,27 +22,25 @@ def test_skill_prompt_loads_and_contains_references() -> None:
     assert "Regulatory Reference" in prompt
 
 
-def test_build_payload_uses_stream_and_skill_input_shape() -> None:
-    settings = get_settings()
+def test_build_payload_shape() -> None:
     request = AnalyzeRequest(
         msg="Check AML risks",
         context={"country": "US", "feature": "wallet top-up"},
     )
-    payload = build_anthropic_payload(request, settings, "system prompt")
-    assert payload["stream"] is True
-    assert payload["messages"][0]["role"] == "user"
-    assert '"msg": "Check AML risks"' in payload["messages"][0]["content"][0]["text"]
-    assert '"country": "US"' in payload["messages"][0]["content"][0]["text"]
+    payload_text = build_user_payload(request)
+    payload = json.loads(payload_text)
+    assert payload["msg"] == "Check AML risks"
+    assert payload["context"]["country"] == "US"
 
 
 def test_stream_endpoint_returns_sse(monkeypatch) -> None:
-    async def fake_stream(_payload, _settings):
-        yield b"event: content_block_delta\n"
-        yield b"data: {\"type\":\"content_block_delta\",\"delta\":{\"text\":\"ok\"}}\n\n"
+    async def fake_stream(_request, _settings, _system_prompt):
+        yield "data: {\"type\":\"token\",\"text\":\"ok\"}\n\n"
+        yield "data: {\"type\":\"done\",\"result\":\"ok\"}\n\n"
 
-    monkeypatch.setattr("app.main.stream_anthropic", fake_stream)
-    monkeypatch.setattr("app.main.settings", get_settings())
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    monkeypatch.setattr("app.main.stream_anthropic_events", fake_stream)
+    patched_settings = replace(get_settings(), anthropic_api_key="test-key")
+    monkeypatch.setattr("app.main.settings", patched_settings)
 
     with TestClient(app) as client:
         response = client.post(
@@ -49,4 +50,5 @@ def test_stream_endpoint_returns_sse(monkeypatch) -> None:
 
     assert response.status_code == 200
     assert "text/event-stream" in response.headers["content-type"]
-    assert "event: content_block_delta" in response.text
+    assert "\"type\":\"token\"" in response.text
+    assert "\"type\":\"done\"" in response.text

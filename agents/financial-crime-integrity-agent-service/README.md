@@ -24,12 +24,10 @@
 Скопируйте `.env.example` в `.env` и заполните:
 
 - `ANTHROPIC_API_KEY`
-- `ANTHROPIC_MODEL`
-- `ANTHROPIC_API_URL`
-- `ANTHROPIC_VERSION`
-- `ANTHROPIC_MAX_TOKENS`
+- `ANTHROPIC_BASE_URL`
+- `CLAUDE_MODEL`
+- `MAX_TOKENS`
 - `ANTHROPIC_TEMPERATURE`
-- `ANTHROPIC_TIMEOUT_SECONDS`
 - `SKILL_DIR`
 
 `.env` и другие env-файлы добавлены в `.gitignore`.
@@ -62,6 +60,11 @@ curl -N -X POST "http://localhost:8080/v1/analyze/stream" \
     }
   }'
 ```
+
+Поток возвращает SSE-события в формате `data: {...}`:
+- `{"type":"token","text":"..."}` — очередной кусок ответа
+- `{"type":"done","result":"..."}` — финальный полный текст
+- `{"type":"error","detail":"..."}` — ошибка
 
 ## Healthcheck
 
