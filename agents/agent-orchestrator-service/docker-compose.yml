@@ -1,0 +1,96 @@
+services:
+  agents-orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agents-orchestrator
+    env_file:
+      - .env
+    ports:
+      - "8090:8090"
+    depends_on:
+      - ambiguilty-resolver-0lvl-agent
+      - financial-crime-integrity-agent
+      - data-protection-agent
+      - payments-vulnerability-agent
+      - consumer-protection-agent
+      - ai-governance-analyst-v3-agent
+      - crypto-domain-analyzer-agent
+    restart: unless-stopped
+
+  ambiguilty-resolver-0lvl-agent:
+    build:
+      context: ../ambiguilty-resolver-0lvl-service
+      dockerfile: Dockerfile
+    container_name: ambiguilty-resolver-0lvl-agent
+    env_file:
+      - ../ambiguilty-resolver-0lvl-service/.env
+    expose:
+      - "8086"
+    restart: unless-stopped
+
+  financial-crime-integrity-agent:
+    build:
+      context: ../financial-crime-integrity-agent-service
+      dockerfile: Dockerfile
+    container_name: financial-crime-integrity-agent
+    env_file:
+      - ../financial-crime-integrity-agent-service/.env
+    expose:
+      - "8080"
+    restart: unless-stopped
+
+  data-protection-agent:
+    build:
+      context: ../data-protection-agent-service
+      dockerfile: Dockerfile
+    container_name: data-protection-agent
+    env_file:
+      - ../data-protection-agent-service/.env
+    expose:
+      - "8082"
+    restart: unless-stopped
+
+  payments-vulnerability-agent:
+    build:
+      context: ../payments-vulnerability-agent-service
+      dockerfile: Dockerfile
+    container_name: payments-vulnerability-agent
+    env_file:
+      - ../payments-vulnerability-agent-service/.env
+    expose:
+      - "8083"
+    restart: unless-stopped
+
+  consumer-protection-agent:
+    build:
+      context: ../consumer-protection-agent-service
+      dockerfile: Dockerfile
+    container_name: consumer-protection-agent
+    env_file:
+      - ../consumer-protection-agent-service/.env
+    expose:
+      - "8084"
+    restart: unless-stopped
+
+  ai-governance-analyst-v3-agent:
+    build:
+      context: ../ai-governance-analyst-v3-service
+      dockerfile: Dockerfile
+    container_name: ai-governance-analyst-v3-agent
+    env_file:
+      - ../ai-governance-analyst-v3-service/.env
+    expose:
+      - "8085"
+    restart: unless-stopped
+
+  crypto-domain-analyzer-agent:
+    build:
+      context: ../crypto-domain-analyzer-service
+      dockerfile: Dockerfile
+    container_name: crypto-domain-analyzer-agent
+    env_file:
+      - ../crypto-domain-analyzer-service/.env
+    expose:
+      - "8087"
+    restart: unless-stopped
