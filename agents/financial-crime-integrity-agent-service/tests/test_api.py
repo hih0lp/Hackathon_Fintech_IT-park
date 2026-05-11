@@ -6,7 +6,7 @@ from dataclasses import replace
 from fastapi.testclient import TestClient
 
 from app.anthropic_client import build_user_payload
-from app.config import get_settings
+from app.config import _normalize_model_id, get_settings
 from app.main import app
 from app.schemas import AnalyzeRequest
 from app.skill_loader import load_skill_prompt
@@ -52,3 +52,8 @@ def test_stream_endpoint_returns_sse(monkeypatch) -> None:
     assert "text/event-stream" in response.headers["content-type"]
     assert "\"type\":\"token\"" in response.text
     assert "\"type\":\"done\"" in response.text
+
+
+def test_model_alias_normalization() -> None:
+    assert _normalize_model_id("claude-4-6-sonnet") == "claude-sonnet-4-6"
+    assert _normalize_model_id("claude-opus-4-7") == "claude-opus-4-7"

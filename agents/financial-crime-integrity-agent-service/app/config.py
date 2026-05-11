@@ -37,6 +37,13 @@ def _get_env_int(name: str, default: int) -> int:
     return int(value)
 
 
+def _normalize_model_id(model: str) -> str:
+    aliases = {
+        "claude-4-6-sonnet": "claude-sonnet-4-6",
+    }
+    return aliases.get(model, model)
+
+
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     skill_dir = Path(
@@ -48,12 +55,14 @@ def get_settings() -> Settings:
     if not skill_dir.is_absolute():
         skill_dir = ROOT_DIR / skill_dir
 
+    model = os.getenv(
+        "CLAUDE_MODEL",
+        os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6"),
+    )
+
     return Settings(
         anthropic_api_key=os.getenv("ANTHROPIC_API_KEY", ""),
-        anthropic_model=os.getenv(
-            "CLAUDE_MODEL",
-            os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6"),
-        ),
+        anthropic_model=_normalize_model_id(model),
         anthropic_base_url=os.getenv(
             "ANTHROPIC_BASE_URL",
             "https://api.anthropic.com",
