@@ -49,7 +49,8 @@ def get_settings() -> Settings:
     skill_dir = Path(
         os.getenv(
             "SKILL_DIR",
-            str(ROOT_DIR / "skill" / "filter-content-agent"),
+            os.getenv("FILTER_CONTENT_SKILL_DIR",
+                      str(ROOT_DIR / "skill" / "filter-content-agent")),
         )
     )
     if not skill_dir.is_absolute():
@@ -69,8 +70,12 @@ def get_settings() -> Settings:
         ),
         anthropic_max_tokens=_get_env_int(
             "MAX_TOKENS",
-            _get_env_int("ANTHROPIC_MAX_TOKENS", 512),
+            _get_env_int("FILTER_CONTENT_MAX_TOKENS",
+                         _get_env_int("ANTHROPIC_MAX_TOKENS", 512)),
         ),
-        anthropic_temperature=_get_env_float("ANTHROPIC_TEMPERATURE", 0.0),
+        anthropic_temperature=_get_env_float(
+            "ANTHROPIC_TEMPERATURE",
+            _get_env_float("FILTER_CONTENT_TEMPERATURE", 0.0),
+        ),
         skill_markdown_path=skill_dir / "SKILL.md",
     )

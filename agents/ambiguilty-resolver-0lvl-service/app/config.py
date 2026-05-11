@@ -50,7 +50,8 @@ def get_settings() -> Settings:
     skill_dir = Path(
         os.getenv(
             "SKILL_DIR",
-            str(ROOT_DIR / "skill" / "ambiguity-resolver-v2"),
+            os.getenv("AMBIGUITY_RESOLVER_SKILL_DIR",
+                      str(ROOT_DIR / "skill" / "ambiguity-resolver-v2")),
         )
     )
     if not skill_dir.is_absolute():
@@ -70,9 +71,13 @@ def get_settings() -> Settings:
         ),
         anthropic_max_tokens=_get_env_int(
             "MAX_TOKENS",
-            _get_env_int("ANTHROPIC_MAX_TOKENS", 8192),
+            _get_env_int("AMBIGUITY_RESOLVER_MAX_TOKENS",
+                         _get_env_int("ANTHROPIC_MAX_TOKENS", 8192)),
         ),
-        anthropic_temperature=_get_env_float("ANTHROPIC_TEMPERATURE", 0.1),
+        anthropic_temperature=_get_env_float(
+            "ANTHROPIC_TEMPERATURE",
+            _get_env_float("AMBIGUITY_RESOLVER_TEMPERATURE", 0.1),
+        ),
         skill_markdown_path=skill_dir / "SKILL.md",
         regulations_markdown_path=skill_dir / "references" / "regulations.md",
     )
