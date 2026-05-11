@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'drf_spectacular_sidecar',
     'django_filters',
     'corsheaders',
-    'user'
+    'user',
+    'project'
 ]
 
 MIDDLEWARE = [
