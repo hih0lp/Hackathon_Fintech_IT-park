@@ -1,14 +1,18 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { auth } from '../../api/client'
+import { useAuth } from '../../context/AuthContext.jsx'
 import styles from './LoginPage.module.css'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const { login, isAuthenticated } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
   const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (e) => {
     setFormData({
@@ -18,15 +22,30 @@ export default function LoginPage() {
     setError('')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!formData.email || !formData.password) {
       setError('Заполните все поля')
       return
     }
-    // Simulate login - replace with actual API call
-    console.log('Login attempt:', formData)
-    navigate('/verify')
+
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const response = await auth.login(formData.email, formData.password)
+      // API returns tokens and user data on successful login
+      if (response.access && response.refresh) {
+        login(response.access, response.refresh)
+        navigate('/projects')
+      } else {
+        setError('Неверный ответ от сервера')
+      }
+    } catch (err) {
+      setError(err.message || 'Неверный email или пароль')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -41,6 +60,9 @@ export default function LoginPage() {
             </svg>
             <span>REGRADAR</span>
           </Link>
+          {isAuthenticated && (
+            <Link to="/projects" className={styles.projectsLink}>Проекты</Link>
+          )}
         </div>
 
         <div className={styles.card}>
@@ -84,8 +106,8 @@ export default function LoginPage() {
               <Link to="/forgot-password" className={styles.forgot}>Забыли пароль?</Link>
             </div>
 
-            <button type="submit" className={styles.submit}>
-              Войти
+            <button type="submit" className={styles.submit} disabled={isLoading}>
+              {isLoading ? 'Вход...' : 'Войти'}
             </button>
           </form>
 

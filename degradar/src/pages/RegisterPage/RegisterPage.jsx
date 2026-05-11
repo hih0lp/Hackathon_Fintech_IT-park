@@ -1,16 +1,19 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { auth } from '../../api/client'
+import { useAuth } from '../../context/AuthContext.jsx'
 import styles from './RegisterPage.module.css'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
     password: '',
     confirmPassword: ''
   })
   const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (e) => {
     setFormData({
@@ -20,9 +23,10 @@ export default function RegisterPage() {
     setError('')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!formData.name || !formData.email || !formData.password) {
+    console.log('Submit started')
+    if (!formData.email || !formData.password) {
       setError('Заполните все обязательные поля')
       return
     }
@@ -34,9 +38,22 @@ export default function RegisterPage() {
       setError('Пароль должен быть не менее 8 символов')
       return
     }
-    // Simulate registration - replace with actual API call
-    console.log('Registration:', formData)
-    navigate('/verify')
+
+    setIsLoading(true)
+    setError('')
+
+    try {
+      console.log('Calling auth.register with:', formData.email)
+      await auth.register(formData.email, formData.password, formData.confirmPassword)
+      console.log('Registration successful')
+      localStorage.setItem('pendingEmail', formData.email)
+      navigate('/verify')
+    } catch (err) {
+      console.error('Registration error:', err)
+      setError(err.message || 'Ошибка регистрации')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -51,6 +68,9 @@ export default function RegisterPage() {
             </svg>
             <span>REGRADAR</span>
           </Link>
+          {isAuthenticated && (
+            <Link to="/projects" className={styles.projectsLink}>Проекты</Link>
+          )}
         </div>
 
         <div className={styles.card}>
@@ -60,19 +80,6 @@ export default function RegisterPage() {
           {error && <div className={styles.error}>{error}</div>}
 
           <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.field}>
-              <label htmlFor="name" className={styles.label}>ФИО</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Иван Иванов"
-                className={styles.input}
-              />
-            </div>
-
             <div className={styles.field}>
               <label htmlFor="email" className={styles.label}>Email</label>
               <input
@@ -119,8 +126,8 @@ export default function RegisterPage() {
                 <Link to="/privacy" className={styles.link}>Политикой конфиденциальности</Link></span>
             </label>
 
-            <button type="submit" className={styles.submit}>
-              Создать аккаунт
+            <button type="submit" className={styles.submit} disabled={isLoading}>
+              {isLoading ? 'Создание...' : 'Создать аккаунт'}
             </button>
           </form>
 

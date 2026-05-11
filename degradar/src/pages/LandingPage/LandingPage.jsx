@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext.jsx'
 import styles from './LandingPage.module.css'
 
 const features = [
@@ -50,11 +51,11 @@ const regulations = ['KYC', 'AML', 'GDPR / КОНФИДЕНЦИАЛЬНОСТЬ'
 
 export default function LandingPage({ onStart }) {
   const navigate = useNavigate()
-  const isLoggedIn = false // Фиксированный режим: пользователь вошёл в аккаунт
+  const { isAuthenticated } = useAuth()
 
   const handleStart = () => {
-    if (isLoggedIn) {
-      navigate('/radar')
+    if (isAuthenticated) {
+      navigate('/projects')
     } else {
       navigate('/register')
     }
@@ -80,7 +81,7 @@ export default function LandingPage({ onStart }) {
           <a href="#about">О продукте</a>
         </nav>
         <div className={styles.navActions}>
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <button className={styles.navLaunch} onClick={handleStart}>
               Запустить
             </button>
@@ -114,7 +115,7 @@ export default function LandingPage({ onStart }) {
               <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2 2"/>
               <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
             </svg>
-            {isLoggedIn ? 'Запустить радар' : 'Начать'}
+            {isAuthenticated ? 'Запустить радар' : 'Начать'}
           </button>
           <button className={styles.heroSecondary}>
             Смотреть демо
@@ -123,7 +124,7 @@ export default function LandingPage({ onStart }) {
               <polygon points="10,8 16,12 10,16" fill="currentColor"/>
             </svg>
           </button>
-          {!isLoggedIn && (
+          {!isAuthenticated && (
             <Link to="/register" className={styles.heroRegister}>
               Регистрация
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -313,7 +314,7 @@ export default function LandingPage({ onStart }) {
           </div>
         </div>
         <button className={styles.aboutCta} onClick={handleStart}>
-          {isLoggedIn ? 'Запустить радар' : 'Начать бесплатный анализ'}
+          {isAuthenticated ? 'Запустить радар' : 'Начать бесплатный анализ'}
         </button>
       </section>
 

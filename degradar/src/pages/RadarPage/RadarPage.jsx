@@ -1,61 +1,90 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './RadarPage.module.css'
-import FeatureInput from '../../features/radar/ui/FeatureInput/FeatureInput.jsx'
-import AnalysisResult from '../../features/radar/ui/AnalysisResult/AnalysisResult.jsx'
 import ChatPanel from '../../features/radar/ui/ChatPanel/ChatPanel.jsx'
-import RadarPanel from '../../widgets/RadarPanel/RadarPanel.jsx'
+import TodoPanel from '../../features/radar/ui/TodoPanel/TodoPanel.jsx'
 import Header from '../../widgets/Header/Header.jsx'
-import {
-  mockProject,
-  mockRadarItems,
-  mockAnalysisResult,
-  mockMessages,
-  mockLastAudit,
-} from '../../shared/mocks/regradar.js'
+import { tasksMock } from '../../features/radar/api/tasksMock.js'
+import { mockProject } from '../../shared/mocks/regradar.js'
 
 export default function RadarPage() {
-  const [analysisResult, setAnalysisResult] = useState(mockAnalysisResult)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [messages, setMessages] = useState(mockMessages)
+  const [messages, setMessages] = useState([])
+  const [tasks, setTasks] = useState([])
 
-  const handleAnalyze = (text) => {
-    setIsAnalyzing(true)
-    setTimeout(() => {
-      setIsAnalyzing(false)
-      // Имитация анализа текста — в реальности здесь будет запрос к LLM
-      const detectedZones = [
-        { id: 'gdpr', name: 'GDPR / Защита данных', level: 'high', color: '#ea580c', description: 'Обработка персональных данных' },
-        { id: 'aml', name: 'AML / Отмывание денег', level: 'critical', color: '#dc2626', description: 'Риски подозрительных операций' },
-      ]
-      
-      setAnalysisResult({
-        ...mockAnalysisResult,
-        summary: `Анализ завершён. Выявлены критические риски в зонах "Защита данных" и "AML". Требуется обновление политик.`,
-        detectionZones: detectedZones,
-        ownerTasks: [
-          { id: 1, label: 'Согласовать текст согласия на обработку данных', done: false },
-          { id: 2, label: 'Определить сроки хранения данных (GDPR Art. 5)', done: false },
-          { id: 3, label: 'Подготовить UX для запроса согласия', done: false },
-        ],
-        complianceTasks: [
-          { id: 1, label: 'Обновить паттерны мониторинга AML', done: false },
-          { id: 2, label: 'Проверить соответствие SCA (PSD2)', done: false },
-          { id: 3, label: 'Провести оценку DPIA (GDPR Art. 35)', done: false },
-        ],
-      })
-    }, 1800)
-  }
+  // Load initial tasks from mock
+  useEffect(() => {
+    tasksMock.list().then(setTasks)
+  }, [])
 
   const handleSendMessage = (text) => {
     const newMsg = { id: Date.now(), type: 'user', text }
     setMessages(prev => [...prev, newMsg])
+    
+    // Simulate bot response with task suggestions
     setTimeout(() => {
-      setMessages(prev => [...prev, {
+      const shouldSuggestTasks = text.toLowerCase().includes('задача') || 
+                                  text.toLowerCase().includes('делать') ||
+                                  text.toLowerCase().includes('нужно')
+      
+      const botResponse = {
         id: Date.now() + 1,
         type: 'bot',
         text: 'По нормам GDPR Art. 6(1)(a), если данные не покидают страну-участника ЕС, дополнительное согласие не требуется. Однако рекомендую зафиксировать правовое основание в DPIA.',
-      }])
+        suggestedTasks: shouldSuggestTasks ? [
+          'Провести оценку DPIA (GDPR Art. 35)',
+          'Обновить политику обработки данных',
+          'Проверить соответствие SCA (PSD2)'
+        ] : []
+      }
+      
+      setMessages(prev => [...prev, botResponse])
     }, 1200)
+  }
+
+  const handleAcceptTask = async (taskTitle) => {
+    try {
+      // Send to backend (mock)
+      await tasksMock.sendToBackend({ title: taskTitle })
+      
+      // Create task locally
+      const newTask = await tasksMock.create(taskTitle)
+      setTasks(prev => [...prev, newTask])
+    } catch (error) {
+      console.error('Failed to create task:', error)
+    }
+  }
+
+  const handleRejectTask = (messageId, taskIndex) => {
+    setMessages(prev => prev.map(msg => {
+      if (msg.id === messageId && msg.suggestedTasks) {
+        const newTasks = [...msg.suggestedTasks]
+        newTasks.splice(taskIndex, 1)
+        return { ...msg, suggestedTasks: newTasks }
+      }
+      return msg
+    }))
+  }
+
+  const handleToggleTask = async (taskId) => {
+    try {
+      const task = tasks.find(t => t.id === taskId)
+      if (task) {
+        await tasksMock.update(taskId, { completed: !task.completed })
+        setTasks(prev => prev.map(t => 
+          t.id === taskId ? { ...t, completed: !t.completed } : t
+        ))
+      }
+    } catch (error) {
+      console.error('Failed to update task:', error)
+    }
+  }
+
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await tasksMock.delete(taskId)
+      setTasks(prev => prev.filter(t => t.id !== taskId))
+    } catch (error) {
+      console.error('Failed to delete task:', error)
+    }
   }
 
   return (
@@ -63,23 +92,24 @@ export default function RadarPage() {
       <Header project={mockProject} />
 
       <div className={styles.body}>
-        {/* Main content */}
+        {/* Main chat area */}
         <main className={styles.main}>
-          <div className={styles.scroll}>
-            <div className={styles.content}>
-              <FeatureInput onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
-
-              {analysisResult && (
-                <AnalysisResult result={analysisResult} />
-              )}
-
-              <ChatPanel messages={messages} onSend={handleSendMessage} />
-            </div>
-          </div>
+          <ChatPanel 
+            messages={messages} 
+            onSend={handleSendMessage}
+            onAcceptTask={handleAcceptTask}
+            onRejectTask={handleRejectTask}
+          />
         </main>
 
-        {/* Right radar panel */}
-        <RadarPanel items={mockRadarItems} lastAudit={mockLastAudit} />
+        {/* Right todo panel */}
+        <aside className={styles.sidebar}>
+          <TodoPanel 
+            tasks={tasks}
+            onToggleTask={handleToggleTask}
+            onDeleteTask={handleDeleteTask}
+          />
+        </aside>
       </div>
     </div>
   )

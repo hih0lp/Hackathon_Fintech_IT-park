@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { auth } from '../../api/client'
 import styles from './VerificationPage.module.css'
 
 export default function VerificationPage() {
@@ -7,7 +8,9 @@ export default function VerificationPage() {
   const [code, setCode] = useState(['', '', '', '', '', ''])
   const [error, setError] = useState('')
   const [resendTimer, setResendTimer] = useState(60)
+  const [isLoading, setIsLoading] = useState(false)
   const inputs = useRef([])
+  const email = localStorage.getItem('pendingEmail') || ''
 
   useEffect(() => {
     if (resendTimer > 0) {
@@ -45,17 +48,31 @@ export default function VerificationPage() {
     }
   }
 
-  const handleVerify = (fullCode) => {
-    // Simulate verification - replace with actual API call
-    console.log('Verifying code:', fullCode)
-    
-    // Demo: accept any 6-digit code
-    if (fullCode === '123456' || fullCode.length === 6) {
-      navigate('/projects')
-    } else {
-      setError('Неверный код подтверждения. Попробуйте снова.')
+  const handleVerify = async (fullCode) => {
+    if (!email) {
+      setError('Email не найден. Вернитесь к регистрации.')
+      return
+    }
+
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const response = await auth.verifyCode(email, fullCode)
+      // API returns tokens on successful verification
+      if (response.access && response.refresh) {
+        auth.setTokens(response.access, response.refresh)
+        localStorage.removeItem('pendingEmail')
+        navigate('/projects')
+      } else {
+        setError('Неверный ответ от сервера')
+      }
+    } catch (err) {
+      setError(err.message || 'Неверный код подтверждения. Попробуйте снова.')
       setCode(['', '', '', '', '', ''])
       inputs.current[0]?.focus()
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -69,11 +86,20 @@ export default function VerificationPage() {
     handleVerify(fullCode)
   }
 
-  const handleResend = () => {
-    setResendTimer(60)
+  const handleResend = async () => {
+    if (!email) {
+      setError('Email не найден. Вернитесь к регистрации.')
+      return
+    }
+
     setError('')
-    console.log('Resending verification code...')
-    // Simulate API call to resend code
+
+    try {
+      await auth.resendCode(email)
+      setResendTimer(60)
+    } catch (err) {
+      setError(err.message || 'Не удалось отправить код повторно')
+    }
   }
 
   return (
@@ -125,8 +151,8 @@ export default function VerificationPage() {
               ))}
             </div>
 
-            <button type="submit" className={styles.submit}>
-              Подтвердить
+            <button type="submit" className={styles.submit} disabled={isLoading}>
+              {isLoading ? 'Проверка...' : 'Подтвердить'}
             </button>
           </form>
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import styles from './ChatPanel.module.css'
 
-export default function ChatPanel({ messages, onSend }) {
+export default function ChatPanel({ messages, onSend, onAcceptTask, onRejectTask }) {
   const [input, setInput] = useState('')
 
   const handleSend = () => {
@@ -21,6 +21,19 @@ export default function ChatPanel({ messages, onSend }) {
   return (
     <div className={styles.container}>
       <div className={styles.messages}>
+        {messages.length === 0 && (
+          <div className={styles.emptyState}>
+            <div className={styles.emptyIcon}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#5b6ef5" strokeWidth="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="3" strokeDasharray="2 2"/>
+              </svg>
+            </div>
+            <h3 className={styles.emptyTitle}>Ассистент по анализу</h3>
+            <p className={styles.emptyText}>Задайте вопрос о регуляторных требованиях или анализе</p>
+          </div>
+        )}
+
         {messages.map(msg => (
           <div key={msg.id} className={`${styles.message} ${msg.type === 'user' ? styles.user : styles.bot}`}>
             {msg.type === 'user' ? (
@@ -41,7 +54,39 @@ export default function ChatPanel({ messages, onSend }) {
                     <circle cx="12" cy="12" r="3" stroke="#5b6ef5" strokeWidth="1.5" strokeDasharray="2 2"/>
                   </svg>
                 </div>
-                <div className={styles.bubble}>{msg.text}</div>
+                <div className={styles.bubble}>
+                  <div className={styles.text}>{msg.text}</div>
+                  {msg.suggestedTasks && msg.suggestedTasks.length > 0 && (
+                    <div className={styles.taskSuggestions}>
+                      <div className={styles.suggestionsTitle}>Рекомендуемые задачи:</div>
+                      {msg.suggestedTasks.map((task, index) => (
+                        <div key={index} className={styles.taskSuggestion}>
+                          <span className={styles.taskText}>{task}</span>
+                          <div className={styles.taskActions}>
+                            <button
+                              className={styles.acceptBtn}
+                              onClick={() => onAcceptTask(task)}
+                              title="Добавить в список дел"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <path d="M5 12l5 5L19 7" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            </button>
+                            <button
+                              className={styles.rejectBtn}
+                              onClick={() => onRejectTask(msg.id, index)}
+                              title="Отклонить"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </>
             )}
           </div>
@@ -53,7 +98,7 @@ export default function ChatPanel({ messages, onSend }) {
           <input
             type="text"
             className={styles.input}
-            placeholder="Задать вопрос ассистенту по результатам анализа..."
+            placeholder="Задать вопрос ассистенту..."
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKey}

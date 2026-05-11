@@ -172,14 +172,15 @@
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
-    overflow: hidden;
     cursor: pointer;
-    transition: transform var(--transition), box-shadow var(--transition);
+    transition: box-shadow var(--transition), border-color var(--transition);
+    display: flex;
+    flex-direction: column;
 }
 
 .projectCard:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 /* Верхняя часть карточки с аватаром */
@@ -189,6 +190,7 @@
     justify-content: space-between;
     padding: 20px 20px 16px;
     position: relative;
+    border-radius: var(--radius) var(--radius) 0 0;
 }
 
 .avatar {
@@ -292,6 +294,8 @@
 /* Контент карточки */
 .cardContent {
     padding: 5px 20px 20px;
+    border-radius: 0 0 var(--radius) var(--radius);
+    flex: 1;
 }
 
 .cardHeader {
@@ -376,6 +380,7 @@
     font-size: 0.9rem;
     line-height: 1;
     margin-bottom: 4px;
+    
 }
 
 .countryMore {
@@ -436,7 +441,7 @@
     border-radius: 8px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     padding: 8px;
-    z-index: 50;
+    z-index: 100;
     animation: dropdown-appear 0.15s ease;
 }
 

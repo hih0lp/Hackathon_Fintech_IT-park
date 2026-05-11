@@ -1,59 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { projects } from '../../api/client'
+import { useAuth } from '../../context/AuthContext.jsx'
 import styles from './ProjectsPage.module.css'
-
-const mockProjects = [
-  {
-    id: 1,
-    name: 'Digital Banking App',
-    description: 'Мобильное приложение для цифрового банкинга с поддержкой P2P-переводов',
-    createdAt: '15 янв 2025',
-    status: 'active',
-    files: [
-      { name: 'ТЗ.pdf', url: '/api/files/1/tz.pdf' },
-      { name: 'Архитектура.docx', url: '/api/files/1/arch.docx' },
-    ],
-    countries: ['Россия', 'Казахстан', 'Армения'],
-  },
-  {
-    id: 2,
-    name: 'AI Credit Scoring',
-    description: 'ИИ-система скоринга кредитов на базе ML-моделей',
-    createdAt: '3 фев 2025',
-    status: 'active',
-    files: [
-      { name: 'ML Model Spec.pdf', url: '/api/files/2/ml-spec.pdf' },
-      { name: 'Данные.xlsx', url: '/api/files/2/data.xlsx' },
-      { name: 'Privacy Impact Assessment.pdf', url: '/api/files/2/pia.pdf' },
-    ],
-    countries: ['Россия', 'Сербия'],
-  },
-  {
-    id: 3,
-    name: 'Open Banking API',
-    description: 'REST API для интеграции с экосистемой открытого банкинга',
-    createdAt: '10 дек 2024',
-    status: 'archived',
-    files: [
-      { name: 'API Docs.yaml', url: '/api/files/3/api.yaml' },
-    ],
-    countries: ['Россия'],
-  },
-  {
-    id: 4,
-    name: 'Crypto Wallet',
-    description: 'Кастодиальный кошелёк для хранения цифровых активов',
-    createdAt: '22 фев 2025',
-    status: 'active',
-    files: [
-      { name: 'Security Audit.pdf', url: '/api/files/4/audit.pdf' },
-      { name: 'Whitepaper.pdf', url: '/api/files/4/whitepaper.pdf' },
-      { name: 'Compliance Report.pdf', url: '/api/files/4/compliance.pdf' },
-      { name: 'Требования.docx', url: '/api/files/4/reqs.docx' },
-    ],
-    countries: ['Россия', 'Казахстан', 'Узбекистан', 'Киргизия'],
-  },
-]
 
 const availableCountries = [
   { code: 'RU', name: 'Россия', flag: '🇷🇺' },
@@ -86,12 +35,16 @@ const getInitials = (name) => name.split(' ').map(n => n[0]).join('').slice(0, 2
 
 export default function ProjectsPage() {
   const navigate = useNavigate()
-  const [projects, setProjects] = useState(mockProjects)
+  const { logout } = useAuth()
+  const [projectsList, setProjectsList] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState('')
   const [activeMenu, setActiveMenu] = useState(null)
   const [activeFiles, setActiveFiles] = useState(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [editingProjectId, setEditingProjectId] = useState(null)
   const [newProject, setNewProject] = useState({
-    name: '',
+    title: '',
     description: '',
     countries: [],
     files: [],
@@ -102,6 +55,23 @@ export default function ProjectsPage() {
   const menuRef = useRef(null)
   const filesRef = useRef(null)
   const modalRef = useRef(null)
+
+  // Load projects on mount
+  useEffect(() => {
+    loadProjects()
+  }, [])
+
+  async function loadProjects() {
+    setIsLoading(true)
+    try {
+      const response = await projects.list()
+      setProjectsList(response.results || [])
+    } catch (err) {
+      setError(err.message || 'Ошибка загрузки проектов')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -128,8 +98,9 @@ export default function ProjectsPage() {
 
   const handleCloseModal = () => {
     setShowCreateModal(false)
+    setEditingProjectId(null)
     setNewProject({
-      name: '',
+      title: '',
       description: '',
       countries: [],
       files: [],
@@ -138,37 +109,48 @@ export default function ProjectsPage() {
     setShowCountryDropdown(false)
   }
 
-  const handleSubmitProject = (e) => {
+  const handleSubmitProject = async (e) => {
     e.preventDefault()
-    if (!newProject.name.trim()) return
+    if (!newProject.title.trim()) return
 
-    const today = new Date()
-    const dateStr = today.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })
+    try {
+      const formData = new FormData()
+      formData.append('title', newProject.title)
+      formData.append('description', newProject.description || '')
+      formData.append('country', newProject.countries.join(', '))
 
-    const project = {
-      id: Date.now(),
-      name: newProject.name,
-      description: newProject.description || 'Описание отсутствует',
-      createdAt: dateStr,
-      status: 'active',
-      files: newProject.files,
-      countries: newProject.countries,
+      newProject.files.forEach(fileObj => {
+        if (fileObj.file) {
+          formData.append('uploaded_files', fileObj.file)
+        }
+      })
+
+      if (editingProjectId) {
+        await projects.partialUpdate(editingProjectId, {
+          title: newProject.title,
+          description: newProject.description,
+          country: newProject.countries.join(', ')
+        })
+      } else {
+        await projects.create(formData)
+      }
+      await loadProjects()
+      handleCloseModal()
+    } catch (err) {
+      setError(err.message || (editingProjectId ? 'Ошибка редактирования проекта' : 'Ошибка создания проекта'))
     }
-
-    setProjects(prev => [project, ...prev])
-    handleCloseModal()
   }
 
   const addCountry = (countryName) => {
-    if (countryName && !newProject.countries.includes(countryName)) {
+    if (!newProject.countries.includes(countryName)) {
       setNewProject(prev => ({ ...prev, countries: [...prev.countries, countryName] }))
     }
     setSelectedCountry('')
     setShowCountryDropdown(false)
   }
 
-  const removeCountry = (country) => {
-    setNewProject(prev => ({ ...prev, countries: prev.countries.filter(c => c !== country) }))
+  const removeCountry = (countryName) => {
+    setNewProject(prev => ({ ...prev, countries: prev.countries.filter(c => c !== countryName) }))
   }
 
   const handleFileUpload = (e) => {
@@ -186,13 +168,23 @@ export default function ProjectsPage() {
   }
 
   const handleOpenProject = (projectId) => {
-    navigate(`/radar?project=${projectId}`)
+    navigate(`/projects/${projectId}`)
   }
 
   const handleEdit = (e, projectId) => {
     e.stopPropagation()
     setActiveMenu(null)
-    console.log('Редактирование проекта:', projectId)
+    const project = projectsList.find(p => p.id === projectId)
+    if (project) {
+      setEditingProjectId(projectId)
+      setNewProject({
+        title: project.title,
+        description: project.description || '',
+        countries: project.country ? project.country.split(', ').map(c => c.trim()) : [],
+        files: [],
+      })
+      setShowCreateModal(true)
+    }
   }
 
   const handleDuplicate = (e, projectId) => {
@@ -207,15 +199,26 @@ export default function ProjectsPage() {
     console.log('Архивирование проекта:', projectId)
   }
 
-  const handleDelete = (e, projectId) => {
+  const handleDelete = async (e, projectId) => {
     e.stopPropagation()
     setActiveMenu(null)
-    console.log('Удаление проекта:', projectId)
+    if (!confirm('Удалить проект?')) return
+    try {
+      await projects.delete(projectId)
+      await loadProjects()
+    } catch (err) {
+      setError(err.message || 'Ошибка удаления проекта')
+    }
   }
 
   const toggleMenu = (e, projectId) => {
     e.stopPropagation()
     setActiveMenu(activeMenu === projectId ? null : projectId)
+  }
+
+  const handleLogout = () => {
+    logout()
+    navigate('/')
   }
 
   return (
@@ -231,7 +234,7 @@ export default function ProjectsPage() {
         </Link>
         <div className={styles.navActions}>
           <Link to="/profile" className={styles.navLink}>Профиль</Link>
-          <button className={styles.navLogout}>Выйти</button>
+          <button className={styles.navLogout} onClick={handleLogout}>Выйти</button>
         </div>
       </header>
 
@@ -239,7 +242,7 @@ export default function ProjectsPage() {
         <div className={styles.container}>
           <div className={styles.headerRow}>
             <h1 className={styles.title}>Проекты</h1>
-            <span className={styles.subtitle}>{projects.length} проектов</span>
+            <span className={styles.subtitle}>{projectsList.length} проектов</span>
           </div>
 
           <button className={styles.createCard} onClick={handleCreateProject}>
@@ -259,8 +262,13 @@ export default function ProjectsPage() {
             </div>
           </button>
 
+          {isLoading ? (
+            <div className={styles.loading}>Загрузка проектов...</div>
+          ) : error ? (
+            <div className={styles.error}>{error}</div>
+          ) : (
           <div className={styles.projectsGrid}>
-            {projects.map(project => {
+            {projectsList.map(project => {
               const color = getProjectColor(project.id)
               
               return (
@@ -271,7 +279,7 @@ export default function ProjectsPage() {
                 >
                   <div className={styles.cardTop} style={{ background: color + '22' }}>
                     <div className={styles.avatar} style={{ background: color }}>
-                      {getInitials(project.name)}
+                      {getInitials(project.title)}
                     </div>
                     
                     <div className={styles.menuContainer} ref={activeMenu === project.id ? menuRef : null}>
@@ -325,9 +333,9 @@ export default function ProjectsPage() {
 
                   <div className={styles.cardContent}>
                     <div className={styles.cardHeader}>
-                      <h3 className={styles.projectName}>{project.name}</h3>
-                      <span className={`${styles.status} ${project.status === 'active' ? styles.active : styles.archived}`}>
-                        {project.status === 'active' ? 'Активный' : 'В архиве'}
+                      <h3 className={styles.projectName}>{project.title}</h3>
+                      <span className={`${styles.status} ${styles.active}`}>
+                        Активный
                       </span>
                     </div>
                     
@@ -339,7 +347,7 @@ export default function ProjectsPage() {
                           <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
                           <polyline points="14 2 14 8 20 8"/>
                         </svg>
-                        <span>{project.files.length} {project.files.length === 1 ? 'файл' : project.files.length < 5 ? 'файла' : 'файлов'}</span>
+                        <span>{(project.files || []).length} {(project.files || []).length === 1 ? 'файл' : (project.files || []).length < 5 ? 'файла' : 'файлов'}</span>
                       </div>
                       <div className={styles.stat}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -347,24 +355,20 @@ export default function ProjectsPage() {
                           <path d="M2 12h20"/>
                           <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
                         </svg>
-                        <span>{project.countries.length} {project.countries.length === 1 ? 'страна' : project.countries.length < 5 ? 'страны' : 'стран'}</span>
+                        <span>{project.country ? project.country.split(', ').length : 0} {project.country && project.country.split(', ').length === 1 ? 'страна' : 'стран'}</span>
                       </div>
                     </div>
 
                     <div className={styles.countriesRow}>
-                      {project.countries.slice(0, 3).map(country => {
-                        const countryData = availableCountries.find(c => c.name === country)
+                      {(project.country ? project.country.split(', ').map(c => c.trim()) : []).map(countryName => {
+                        const countryData = availableCountries.find(c => c.name === countryName)
                         return (
-                          
-                          <span key={country} className={styles.countryTag}>
+                          <span key={countryName} className={styles.countryTag}>
                             <span className={styles.countryTagFlag}>{countryData?.flag}</span>
-                            {country}
+                            {countryName}
                           </span>
                         )
                       })}
-                      {project.countries.length > 3 && (
-                        <span className={styles.countryMore}>+{project.countries.length - 3}</span>
-                      )}
                     </div>
 
                     <div className={styles.filesSection} ref={activeFiles === project.id ? filesRef : null}>
@@ -380,7 +384,7 @@ export default function ProjectsPage() {
                             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
                             <polyline points="14 2 14 8 20 8"/>
                           </svg>
-                          <span>Файлы ({project.files.length})</span>
+                          <span>Файлы ({(project.files || []).length})</span>
                         </div>
                         <svg 
                           width="14" 
@@ -397,22 +401,25 @@ export default function ProjectsPage() {
                       
                       {activeFiles === project.id && (
                         <div className={styles.filesDropdown}>
-                          {project.files.map(file => (
-                            <a 
-                              key={file.name} 
-                              href={file.url} 
-                              className={styles.fileLink}
-                              onClick={(e) => e.stopPropagation()}
-                              download
-                            >
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                                <polyline points="7 10 12 15 17 10"/>
-                                <line x1="12" y1="15" x2="12" y2="3"/>
-                              </svg>
-                              {file.name}
-                            </a>
-                          ))}
+                          {(project.files || []).map(file => {
+                            const fileName = file.file ? file.file.split('/').pop() : 'файл'
+                            return (
+                              <a 
+                                key={file.id} 
+                                href={file.file} 
+                                className={styles.fileLink}
+                                onClick={(e) => e.stopPropagation()}
+                                download
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                  <polyline points="7 10 12 15 17 10"/>
+                                  <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                {fileName}
+                              </a>
+                            )
+                          })}
                         </div>
                       )}
                     </div>
@@ -421,6 +428,7 @@ export default function ProjectsPage() {
               )
             })}
           </div>
+          )}
         </div>
       </main>
 
@@ -429,7 +437,7 @@ export default function ProjectsPage() {
         <div className={styles.modalOverlay}>
           <div className={styles.modal} ref={modalRef}>
             <div className={styles.modalHeader}>
-              <h2>Создать новый проект</h2>
+              <h2>{editingProjectId ? 'Редактировать проект' : 'Создать новый проект'}</h2>
               <button className={styles.modalClose} onClick={handleCloseModal}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <line x1="18" y1="6" x2="6" y2="18"/>
@@ -444,8 +452,8 @@ export default function ProjectsPage() {
                 <input
                   type="text"
                   id="projectName"
-                  value={newProject.name}
-                  onChange={(e) => setNewProject(prev => ({ ...prev, name: e.target.value }))}
+                  value={newProject.title}
+                  onChange={(e) => setNewProject(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="Например: Digital Banking App"
                   required
                 />
@@ -465,13 +473,13 @@ export default function ProjectsPage() {
               <div className={styles.formGroup}>
                 <label>Страны</label>
                 <div className={styles.selectedCountries}>
-                  {newProject.countries.map(country => {
-                    const countryData = availableCountries.find(c => c.name === country)
+                  {newProject.countries.map(countryName => {
+                    const countryData = availableCountries.find(c => c.name === countryName)
                     return (
-                      <span key={country} className={styles.countryChip}>
+                      <span key={countryName} className={styles.countryChip}>
                         <span className={styles.countryFlag}>{countryData?.flag}</span>
-                        {country}
-                        <button type="button" onClick={() => removeCountry(country)}>
+                        {countryName}
+                        <button type="button" onClick={() => removeCountry(countryName)}>
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <line x1="18" y1="6" x2="6" y2="18"/>
                             <line x1="6" y1="6" x2="18" y2="18"/>
@@ -487,7 +495,7 @@ export default function ProjectsPage() {
                     className={styles.countryDropdownButton}
                     onClick={() => setShowCountryDropdown(!showCountryDropdown)}
                   >
-                    <span>Добавить страну</span>
+                    <span>Выбрать страны</span>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                       <polyline points="6 9 12 15 18 9"/>
                     </svg>
@@ -556,7 +564,7 @@ export default function ProjectsPage() {
                   Отмена
                 </button>
                 <button type="submit" className={styles.createBtn}>
-                  Создать проект
+                  {editingProjectId ? 'Сохранить изменения' : 'Создать проект'}
                 </button>
               </div>
             </form>
