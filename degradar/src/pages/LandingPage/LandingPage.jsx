@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
+import { motion } from 'framer-motion'
 import styles from './LandingPage.module.css'
 
 const features = [
@@ -49,6 +49,15 @@ const features = [
 
 const regulations = ['KYC', 'AML', 'GDPR / КОНФИДЕНЦИАЛЬНОСТЬ', 'AI ACT', 'PSD2 / PSD3', 'ОТКРЫТЫЙ БАНКИНГ', 'DPIA', 'ISO 27001']
 
+const particles = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: Math.random() * 4 + 2,
+  delay: Math.random() * 5,
+  duration: Math.random() * 10 + 10,
+}))
+
 export default function LandingPage({ onStart }) {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
@@ -63,8 +72,39 @@ export default function LandingPage({ onStart }) {
 
   return (
     <div className={styles.root}>
+      {/* Floating Particles Background */}
+      <div className={styles.particles}>
+        {particles.map(p => (
+          <motion.div
+            key={p.id}
+            className={styles.particle}
+            style={{
+              left: `${p.x}%`,
+              top: `${p.y}%`,
+              width: p.size,
+              height: p.size,
+            }}
+            animate={{
+              y: [0, -30, 0],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{
+              duration: p.duration,
+              delay: p.delay,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
+      </div>
+
       {/* НАВИГАЦИЯ */}
-      <header className={styles.nav}>
+      <motion.header 
+        className={styles.nav}
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className={styles.navLogo}>
           <div className={styles.navLogoIcon}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -92,75 +132,151 @@ export default function LandingPage({ onStart }) {
             </>
           )}
         </div>
-      </header>
+      </motion.header>
 
       {/* ГЕРОЙ */}
       <section className={styles.hero}>
-        <div className={styles.heroBadge}>
-          <span className={styles.heroLiveDot} />
+        <motion.div 
+          className={styles.heroBadge}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <motion.span 
+            className={styles.heroLiveDot}
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
           Аналитика соответствия в реальном времени
-        </div>
-        <h1 className={styles.heroTitle}>
+        </motion.div>
+        
+        <motion.h1 
+          className={styles.heroTitle}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
           Запускайте фичи.<br />
-          <span className={styles.heroGradient}>Оставайтесь без рисков.</span>
-        </h1>
-        <p className={styles.heroSub}>
+          <motion.span 
+            className={styles.heroGradient}
+            animate={{ 
+              backgroundPosition: ['0%', '100%', '0%'],
+            }}
+            transition={{ 
+              duration: 3, 
+              repeat: Infinity,
+              ease: 'linear'
+            }}
+          >Оставайтесь без рисков.</motion.span>
+        </motion.h1>
+        
+        <motion.p 
+          className={styles.heroSub}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
           REGRADAR анализирует новые фичи на регуляторные риски в реальном времени —
           AML, GDPR, PSD2, AI ACT и другие, прямо из описания вашей задачи.
-        </p>
-        <div className={styles.heroActions}>
-          <button className={styles.heroPrimary} onClick={handleStart}>
+        </motion.p>
+        
+        <motion.div 
+          className={styles.heroActions}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+        >
+          <motion.button 
+            className={styles.heroPrimary} 
+            onClick={handleStart}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
               <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2 2"/>
               <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
             </svg>
             {isAuthenticated ? 'Запустить радар' : 'Начать'}
-          </button>
-          <button className={styles.heroSecondary}>
+          </motion.button>
+          <motion.button 
+            className={styles.heroSecondary}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             Смотреть демо
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
               <polygon points="10,8 16,12 10,16" fill="currentColor"/>
             </svg>
-          </button>
+          </motion.button>
           {!isAuthenticated && (
-            <Link to="/register" className={styles.heroRegister}>
-              Регистрация
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <polyline points="10,17 15,12 10,7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <line x1="15" y1="12" x2="3" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </Link>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Link to="/register" className={styles.heroRegister}>
+                Регистрация
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <polyline points="10,17 15,12 10,7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <line x1="15" y1="12" x2="3" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </Link>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
 
         {/* Превью метрик радара */}
-        <div className={styles.heroPreview}>
+        <motion.div 
+          className={styles.heroPreview}
+          initial={{ opacity: 0, rotateX: 10 }}
+          animate={{ opacity: 1, rotateX: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          whileHover={{ 
+            rotateX: -5,
+            rotateY: 5,
+            scale: 1.02
+          }}
+          style={{ transformStyle: 'preserve-3d' }}
+        >
           <div className={styles.previewCard}>
-            <div className={styles.previewHeader}>
+            <motion.div 
+              className={styles.previewHeader}
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
               <span className={styles.previewDot} />
               <span>СТАТУС РАДАРА — СКАНИРОВАНИЕ...</span>
-            </div>
+            </motion.div>
             <div className={styles.previewItems}>
               {[
                 { label: 'KYC', status: 'СРЕДНИЙ', color: '#d97706' },
-                { label: 'AML', status: 'КРИТИЧЕСКИЙ', color: '#dc2626' },
+                { label: 'AML', status: 'КРИТИЧЕСКИЙ', color: '#224d47' },
                 { label: 'GDPR', status: 'ВЫСОКИЙ', color: '#ea6c0a' },
                 { label: 'PSD2', status: 'УМЕРЕННЫЙ', color: '#2563eb' },
                 { label: 'ОТКРЫТЫЙ БАНКИНГ', status: 'БЕЗОПАСНО', color: '#059669' },
-              ].map(item => (
-                <div key={item.label} className={styles.previewItem}>
+              ].map((item, index) => (
+                <motion.div 
+                  key={item.label} 
+                  className={styles.previewItem}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.7 + index * 0.1 }}
+                >
                   <span className={styles.previewLabel}>{item.label}</span>
-                  <span className={styles.previewStatus} style={{ color: item.color, background: item.color + '18' }}>
+                  <motion.span 
+                    className={styles.previewStatus} 
+                    style={{ color: item.color, background: item.color + '18' }}
+                    whileHover={{ scale: 1.1 }}
+                  >
                     {item.status}
-                  </span>
-                </div>
+                  </motion.span>
+                </motion.div>
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* БЕГУЩАЯ СТРОКА РЕГУЛИРОВАНИЙ */}
@@ -172,57 +288,35 @@ export default function LandingPage({ onStart }) {
         </div>
       </div>
 
-      {/* ПОКРЫТИЕ (Закомментировано)
-      <section className={styles.covSection}>
-        <div className={styles.covHeader}>
-          <h2 className={styles.covTitle}>Покрытие регулирований</h2>
-          <p className={styles.covSubtitle}>Мы покрываем 15+ регуляторных фреймворков</p>
-        </div>
-        <div className={styles.covGrid}>
-          {[
-            { name: 'KYC', desc: 'Комплаенс "Знай своего клиента"', level: 'Полное', color: '#059669' },
-            { name: 'AML', desc: 'Стандарты по борьбе с отмыванием денег', level: 'Полное', color: '#059669' },
-            { name: 'GDPR', desc: 'Европейский регламент по защите данных', level: 'Полное', color: '#059669' },
-            { name: 'AI Act', desc: 'Европейские правила в сфере ИИ', level: 'Частичное', color: '#d97706' },
-            { name: 'PSD2/PSD3', desc: 'Директива о платежных услугах', level: 'Полное', color: '#059669' },
-            { name: 'Открытый банкинг', desc: 'API для обмена финансовыми данными', level: 'Полное', color: '#059669' },
-            { name: 'DPIA', desc: 'Оценка воздействия на защиту данных', level: 'Полное', color: '#059669' },
-            { name: 'ISO 27001', desc: 'Управление информационной безопасностью', level: 'Частичное', color: '#d97706' },
-            { name: 'Предотвращение мошенничества', desc: 'Мониторинг транзакций', level: 'Полное', color: '#059669' },
-            { name: 'Кредитный скоринг', desc: 'Комплаенс справедливого кредитования', level: 'Частичное', color: '#d97706' },
-            { name: 'Крипто/DeFi', desc: 'Регулирование цифровых активов', level: 'Частичное', color: '#d97706' },
-            { name: 'Защита потребителей', desc: 'Стандарты добросовестного отношения', level: 'Полное', color: '#059669' },
-          ].map((item) => (
-            <div key={item.name} className={styles.covCard}>
-              <div className={styles.covIcon}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-              </div>
-              <h3 className={styles.covName}>{item.name}</h3>
-              <p className={styles.covDesc}>{item.desc}</p>
-              <span className={styles.covBadge} style={{ background: item.color + '15', color: item.color }}>
-                {item.level}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section> */}
-
       {/* ВОЗМОЖНОСТИ */}
-      <section className={styles.features} id="features">
+      <motion.section 
+        className={styles.features} 
+        id="features"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
         <div className={styles.sectionLabel}>ПОЧЕМУ REGRADAR</div>
         <h2 className={styles.sectionTitle}>Создан для продуктовых команд, которые запускаются быстро</h2>
         <div className={styles.featureGrid}>
-          {features.map(f => (
-            <div key={f.title} className={styles.featureCard}>
+          {features.map((f, index) => (
+            <motion.div 
+              key={f.title} 
+              className={styles.featureCard}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+            >
               <div className={styles.featureIcon}>{f.icon}</div>
               <h3 className={styles.featureTitle}>{f.title}</h3>
               <p className={styles.featureDesc}>{f.desc}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* О ПРОДУКТЕ */}
       <section className={styles.aboutSection} id="about">
@@ -313,9 +407,14 @@ export default function LandingPage({ onStart }) {
             </div>
           </div>
         </div>
-        <button className={styles.aboutCta} onClick={handleStart}>
+        <motion.button 
+          className={styles.aboutCta} 
+          onClick={handleStart}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           {isAuthenticated ? 'Запустить радар' : 'Начать бесплатный анализ'}
-        </button>
+        </motion.button>
       </section>
 
       {/* ФУТЕР */}

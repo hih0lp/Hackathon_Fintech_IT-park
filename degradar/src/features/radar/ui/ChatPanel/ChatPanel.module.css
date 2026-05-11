@@ -36,7 +36,7 @@
 }
 
 .user .bubble {
-  background: linear-gradient(135deg, rgba(91, 110, 245, 0.25), rgba(168, 85, 247, 0.18));
+  background: linear-gradient(135deg, rgba(91, 110, 245, 0.25), rgba(34, 77, 71, 0.18));
   border: 1px solid rgba(91, 110, 245, 0.25);
   color: var(--text-primary);
   border-bottom-right-radius: 3px;
@@ -116,7 +116,7 @@
   width: 28px;
   height: 28px;
   border-radius: 6px;
-  background: linear-gradient(135deg, #5b6ef5, #a855f7);
+  background: linear-gradient(135deg, #5b6ef5, #224d47);
   border: none;
   color: white;
   display: flex;
@@ -224,9 +224,9 @@
   width: 28px;
   height: 28px;
   border-radius: 6px;
-  background: #fee2e2;
-  border: 1px solid #fca5a5;
-  color: #dc2626;
+  background: #e8f0ee;
+  border: 1px solid #a8c8c2;
+  color: #224d47;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -235,7 +235,7 @@
 }
 
 .rejectBtn:hover {
-  background: #fecaca;
+  background: #d0e0dd;
   transform: translateY(-1px);
 }
   opacity: 0.3;

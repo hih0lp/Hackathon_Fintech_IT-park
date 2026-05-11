@@ -1,10 +1,11 @@
+import { Link } from 'react-router-dom'
 import styles from './Header.module.css'
 
 export default function Header({ project }) {
   return (
     <header className={styles.header}>
       <div className={styles.left}>
-        <div className={styles.logo}>
+        <Link to="/" className={styles.logo}>
           <div className={styles.logoIcon}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="#5b6ef5" strokeWidth="1.5"/>
@@ -14,7 +15,7 @@ export default function Header({ project }) {
             </svg>
           </div>
           <span className={styles.logoText}>REGRADAR</span>
-        </div>
+        </Link>
 
         <div className={styles.divider} />
 
@@ -32,7 +33,6 @@ export default function Header({ project }) {
 
       <nav className={styles.nav}>
         <a href="#" className={styles.navLink}>DOCUMENTATION</a>
-        <a href="#" className={styles.navLink}>ACTIVE VAULT</a>
         <button className={styles.userBtn}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.5"/>

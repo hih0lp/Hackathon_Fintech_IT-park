@@ -2,13 +2,22 @@ import { useState, useEffect } from 'react'
 import styles from './RadarPage.module.css'
 import ChatPanel from '../../features/radar/ui/ChatPanel/ChatPanel.jsx'
 import TodoPanel from '../../features/radar/ui/TodoPanel/TodoPanel.jsx'
+import ChatSelector from '../../features/radar/ui/ChatSelector/ChatSelector.jsx'
 import Header from '../../widgets/Header/Header.jsx'
 import { tasksMock } from '../../features/radar/api/tasksMock.js'
 import { mockProject } from '../../shared/mocks/regradar.js'
 
+// Mock chats data
+const mockChats = [
+  { id: 1, name: 'GDPR Compliance', date: 'Сегодня' },
+  { id: 2, name: 'AML Risk Assessment', date: 'Вчера' },
+  { id: 3, name: 'PSD2 Integration', date: '2 дня назад' },
+]
+
 export default function RadarPage() {
   const [messages, setMessages] = useState([])
   const [tasks, setTasks] = useState([])
+  const [selectedChat, setSelectedChat] = useState(mockChats[0])
 
   // Load initial tasks from mock
   useEffect(() => {
@@ -94,6 +103,11 @@ export default function RadarPage() {
       <div className={styles.body}>
         {/* Main chat area */}
         <main className={styles.main}>
+          <ChatSelector 
+            chats={mockChats}
+            selectedChat={selectedChat}
+            onSelectChat={setSelectedChat}
+          />
           <ChatPanel 
             messages={messages} 
             onSend={handleSendMessage}

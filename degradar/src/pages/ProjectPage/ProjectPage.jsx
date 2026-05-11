@@ -65,14 +65,25 @@ export default function ProjectPage() {
   return (
     <div className={styles.page}>
       <header className={styles.nav}>
-        <Link to="/projects" className={styles.backLink}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span>К проектам</span>
-        </Link>
+        <div className={styles.navLeft}>
+          <Link to="/" className={styles.logo}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="#224d47" strokeWidth="1.5"/>
+              <circle cx="12" cy="12" r="5" stroke="#224d47" strokeWidth="1.5" strokeDasharray="2 2"/>
+              <circle cx="12" cy="12" r="1.5" fill="#224d47"/>
+            </svg>
+            <span>REGRADAR</span>
+          </Link>
+          <div className={styles.navDivider} />
+          <Link to="/projects" className={styles.backLink}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span>К проектам</span>
+          </Link>
+        </div>
         <div className={styles.navActions}>
-          <span className={styles.projectName}>{project?.title || 'Загрузка...'}</span>
+          <span className={styles.projectTitle}>{project?.title || 'Загрузка...'}</span>
         </div>
       </header>
 

@@ -135,8 +135,8 @@ export default function AnalysisResult({ result }) {
                 </div>
                 <p className={styles.recReason}>{rec.reason}</p>
                 <span className={styles.recPriority} style={{ 
-                  background: rec.priority === 'critical' ? '#fee2e2' : rec.priority === 'high' ? '#fef3c7' : '#f1f5f9',
-                  color: rec.priority === 'critical' ? '#dc2626' : rec.priority === 'high' ? '#d97706' : '#64748b'
+                  background: rec.priority === 'critical' ? '#e8f0ee' : rec.priority === 'high' ? '#fef3c7' : '#f1f5f9',
+                  color: rec.priority === 'critical' ? '#224d47' : rec.priority === 'high' ? '#d97706' : '#64748b'
                 }}>
                   Приоритет: {getPriorityLabel(rec.priority)}
                 </span>

@@ -28,6 +28,33 @@
     border-bottom: 1px solid var(--border-color);
 }
 
+.navLeft {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: opacity 0.2s ease;
+}
+
+.logo:hover {
+    opacity: 0.7;
+}
+
+.navDivider {
+    width: 1px;
+    height: 24px;
+    background: var(--border-color);
+}
+
 .backLink {
     display: flex;
     align-items: center;
@@ -48,7 +75,7 @@
     gap: 16px;
 }
 
-.projectName {
+.projectTitle {
     font-weight: 600;
     color: var(--text-primary);
     font-size: 1rem;
