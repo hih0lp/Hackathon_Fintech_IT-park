@@ -25,7 +25,11 @@ services:
       dockerfile: Dockerfile
     container_name: filter-content-agent
     env_file:
-      - ../filter-content-agent/.env
+      - .env
+    environment:
+      MAX_TOKENS: ${FILTER_CONTENT_MAX_TOKENS}
+      ANTHROPIC_TEMPERATURE: ${FILTER_CONTENT_TEMPERATURE}
+      SKILL_DIR: ${FILTER_CONTENT_SKILL_DIR}
     expose:
       - "8088"
     restart: unless-stopped
@@ -36,7 +40,11 @@ services:
       dockerfile: Dockerfile
     container_name: ambiguilty-resolver-0lvl-agent
     env_file:
-      - ../ambiguilty-resolver-0lvl-service/.env
+      - .env
+    environment:
+      MAX_TOKENS: ${AMBIGUITY_RESOLVER_MAX_TOKENS}
+      ANTHROPIC_TEMPERATURE: ${AMBIGUITY_RESOLVER_TEMPERATURE}
+      SKILL_DIR: ${AMBIGUITY_RESOLVER_SKILL_DIR}
     expose:
       - "8086"
     restart: unless-stopped
@@ -47,7 +55,11 @@ services:
       dockerfile: Dockerfile
     container_name: financial-crime-integrity-agent
     env_file:
-      - ../financial-crime-integrity-agent-service/.env
+      - .env
+    environment:
+      MAX_TOKENS: ${FINANCIAL_CRIME_MAX_TOKENS}
+      ANTHROPIC_TEMPERATURE: ${FINANCIAL_CRIME_TEMPERATURE}
+      SKILL_DIR: ${FINANCIAL_CRIME_SKILL_DIR}
     expose:
       - "8080"
     restart: unless-stopped
@@ -58,7 +70,11 @@ services:
       dockerfile: Dockerfile
     container_name: data-protection-agent
     env_file:
-      - ../data-protection-agent-service/.env
+      - .env
+    environment:
+      MAX_TOKENS: ${DATA_PROTECTION_MAX_TOKENS}
+      ANTHROPIC_TEMPERATURE: ${DATA_PROTECTION_TEMPERATURE}
+      SKILL_DIR: ${DATA_PROTECTION_SKILL_DIR}
     expose:
       - "8082"
     restart: unless-stopped
@@ -69,7 +85,11 @@ services:
       dockerfile: Dockerfile
     container_name: payments-vulnerability-agent
     env_file:
-      - ../payments-vulnerability-agent-service/.env
+      - .env
+    environment:
+      MAX_TOKENS: ${PAYMENTS_VULNERABILITY_MAX_TOKENS}
+      ANTHROPIC_TEMPERATURE: ${PAYMENTS_VULNERABILITY_TEMPERATURE}
+      SKILL_DIR: ${PAYMENTS_VULNERABILITY_SKILL_DIR}
     expose:
       - "8083"
     restart: unless-stopped
@@ -80,7 +100,11 @@ services:
       dockerfile: Dockerfile
     container_name: consumer-protection-agent
     env_file:
-      - ../consumer-protection-agent-service/.env
+      - .env
+    environment:
+      MAX_TOKENS: ${CONSUMER_PROTECTION_MAX_TOKENS}
+      ANTHROPIC_TEMPERATURE: ${CONSUMER_PROTECTION_TEMPERATURE}
+      SKILL_DIR: ${CONSUMER_PROTECTION_SKILL_DIR}
     expose:
       - "8084"
     restart: unless-stopped
@@ -91,7 +115,11 @@ services:
       dockerfile: Dockerfile
     container_name: ai-governance-analyst-v3-agent
     env_file:
-      - ../ai-governance-analyst-v3-service/.env
+      - .env
+    environment:
+      MAX_TOKENS: ${AI_GOVERNANCE_MAX_TOKENS}
+      ANTHROPIC_TEMPERATURE: ${AI_GOVERNANCE_TEMPERATURE}
+      SKILL_DIR: ${AI_GOVERNANCE_SKILL_DIR}
     expose:
       - "8085"
     restart: unless-stopped
@@ -102,7 +130,11 @@ services:
       dockerfile: Dockerfile
     container_name: crypto-domain-analyzer-agent
     env_file:
-      - ../crypto-domain-analyzer-service/.env
+      - .env
+    environment:
+      MAX_TOKENS: ${CRYPTO_DOMAIN_MAX_TOKENS}
+      ANTHROPIC_TEMPERATURE: ${CRYPTO_DOMAIN_TEMPERATURE}
+      SKILL_DIR: ${CRYPTO_DOMAIN_SKILL_DIR}
     expose:
       - "8087"
     restart: unless-stopped
