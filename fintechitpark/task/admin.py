@@ -6,14 +6,14 @@ from .models import Task
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'chat_link', 'available', 'created')
-    list_filter = ('available', 'created', 'chat__project__user')
+    list_display = ('id', 'title', 'chat_link', 'active', 'created')
+    list_filter = ('active', 'created', 'chat__project__user')
     search_fields = ('title', 'chat__name', 'chat__project__title')
     raw_id_fields = ('chat',)
     readonly_fields = ('created',)
     list_select_related = ('chat', 'chat__project')
     fieldsets = (
-        (None, {'fields': ('chat', 'title', 'available', 'tracker_task_id')}),
+        (None, {'fields': ('chat', 'title', 'active', 'tracker_task_id')}),
         ('Даты', {'fields': ('created',), 'classes': ('collapse',)}),
     )
 

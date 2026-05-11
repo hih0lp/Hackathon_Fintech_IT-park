@@ -16,10 +16,10 @@ from .serializers import TaskSerializer, TaskBulkCreateSerializer
         responses={200: TaskSerializer(many=True)}
     )
 )
-class TaskListCreateView(generics.ListCreateAPIView):
+class TaskListCreateView(generics.ListAPIView):
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filterset_fields = ['chat']
+    filterset_fields = ['chat__id']
 
     def get_queryset(self):
         return Task.objects.filter(chat__project__user=self.request.user)

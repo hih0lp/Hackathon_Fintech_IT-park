@@ -6,7 +6,7 @@ from chat.models import Chat
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ('id', 'title', 'available', 'created')
+        fields = ('id', 'title', 'active', 'created')
         read_only_fields = ('id', 'created', 'title')
 
 

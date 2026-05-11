@@ -7,9 +7,10 @@ class ChatSerializer(serializers.ModelSerializer):
     project_id = serializers.PrimaryKeyRelatedField(
         source='project', queryset=Project.objects.all(), write_only=True
     )
+
     class Meta:
         model = Chat
-        fields = ('id', 'name', 'created', 'project_id')
+        fields = ('id', 'name', 'created', 'project_id', 'available')
 
 
 class MessageSerializer(serializers.ModelSerializer):
