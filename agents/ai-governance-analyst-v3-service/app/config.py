@@ -26,14 +26,14 @@ class Settings:
 
 def _get_env_float(name: str, default: float) -> float:
     value = os.getenv(name)
-    if value is None:
+    if value is None or value == "":
         return default
     return float(value)
 
 
 def _get_env_int(name: str, default: int) -> int:
     value = os.getenv(name)
-    if value is None:
+    if value is None or value == "":
         return default
     return int(value)
 
