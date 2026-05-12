@@ -57,9 +57,10 @@ async def orchestrate(
     payload = {"msg": request.msg, "context": request.context}
 
     logger.info(
-        "Request received | msg_len=%d | add_agents_raw=%s",
+        "Request received | msg_len=%d | add_agents_len=%s | add_agents_raw=%s",
         len(msg),
-        add_agents[:120] if add_agents else "None",
+        len(add_agents) if add_agents else 0,
+        add_agents if add_agents else "None",
     )
 
     def event_stream() -> Iterator[str]:

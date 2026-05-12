@@ -60,27 +60,39 @@ async def _run_single_agent(
     )
 
     user_payload = json.dumps({"msg": msg, "context": context}, ensure_ascii=False)
+    full_text = ""
+    stop_reason: str | None = None
 
     try:
-        message = await client.messages.create(
+        async with client.messages.stream(
             model=settings.anthropic_model,
             max_tokens=settings.anthropic_max_tokens,
             temperature=settings.anthropic_temperature,
             system=agent.skill,
             messages=[{"role": "user", "content": user_payload}],
-        )
+        ) as stream:
+            async for text in stream.text_stream:
+                full_text += text
+            final = await stream.get_final_message()
+            stop_reason = getattr(final, "stop_reason", None)
     except Exception as exc:
         logger.exception("Agent %s — Anthropic call failed: %s", agent.name, exc)
         raise
 
-    raw_text = message.content[0].text if message.content else ""
+    if stop_reason == "max_tokens":
+        logger.warning(
+            "Agent %s — response truncated by max_tokens (len=%d)",
+            agent.name,
+            len(full_text),
+        )
+
     logger.info(
         "Agent done: %s | stop_reason=%s | text_len=%d",
         agent.name,
-        getattr(message, "stop_reason", "?"),
-        len(raw_text),
+        stop_reason or "?",
+        len(full_text),
     )
-    parsed = _try_parse_json(raw_text)
+    parsed = _try_parse_json(full_text)
     return agent.name, parsed
 
 
