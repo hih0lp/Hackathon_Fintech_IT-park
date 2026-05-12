@@ -81,12 +81,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             context
         )
 
-        # Отправляем сообщение пользователя в чат
-        await self.send_chat_message('user', user_message, llm_req.id)
-
         # Запускаем задачу в Dramatiq
         # Используем database_sync_to_async для синхронного вызова
-        call_llm.send(llm_req.id, self.chat_id, user_message, context)
+        try:
+            call_llm.send(llm_req.id, self.chat_id, user_message, context)
+        except Exception as e:
+            await self.send(text_data=json.dumps({
+                "error": e
+            }))
+            return
 
         # Отправляем статус о начале обработки
         await self.send(text_data=json.dumps({
@@ -117,15 +120,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'messages': messages
         }))
 
-    async def send_chat_message(self, sender, text, request_id=None):
-        """Отправка сообщения в чат"""
-        await self.send(text_data=json.dumps({
-            'type': 'chat_message',
-            'sender': sender,
-            'message': text,
-            'request_id': request_id,
-            'timestamp': None  # Можно добавить время
-        }))
+    # async def send_chat_message(self, sender, text, request_id=None):
+    #     """Отправка сообщения в чат"""
+    #     await self.send(text_data=json.dumps({
+    #         'type': 'chat_message',
+    #         'sender': sender,
+    #         'message': text,
+    #         'request_id': request_id,
+    #         'timestamp': None  # Можно добавить время
+    #     }))
 
     async def send_error(self, error_message):
         """Отправка ошибки"""
