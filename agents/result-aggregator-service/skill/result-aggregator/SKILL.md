@@ -55,7 +55,7 @@ Iterate over all (now normalized) agent results. A domain is **empty** if its `s
 - is an empty string `""`
 - contains no numbered lines (no `1)`, `2)`, etc.)
 
-Collect only the non-empty domains. If ALL domains are empty, return `{"spec": "", "tasks": []}` and stop.
+Collect only the non-empty domains. If ALL domains are empty, return `{"type": "done", "spec": "", "tasks": []}` and stop.
 
 ## Step 2 — Deduplicate vulnerabilities across domains
 
@@ -111,6 +111,7 @@ Your entire response is the JSON object and nothing else.
 
 ```json
 {
+  "type": "done",
   "spec": "<merged domain sections separated by blank lines>",
   "tasks": ["unique task 1", "unique task 2", "..."]
 }
@@ -122,8 +123,9 @@ Your entire response is the JSON object and nothing else.
 - **No prefix / suffix**: do not write anything before the opening `{` or after the closing `}` — no "Here is", no "Result:", no explanations.
 - **No extra quotes**: newlines inside `spec` must be encoded as `\n` (the JSON escape), not as literal line breaks that would break string parsing.
 - **Valid JSON only**: the output must parse cleanly with `json.loads()`. If you are unsure, mentally validate: every string is double-quoted, commas separate array/object entries but there is no trailing comma, all backslashes inside strings are properly escaped.
-- **Exact keys**: the top-level object has exactly two keys — `"spec"` (string) and `"tasks"` (array of strings). No additional keys.
+- **Exact keys**: the top-level object has exactly three keys — `"type"` (always the string `"done"`), `"spec"` (string), and `"tasks"` (array of strings). No additional keys.
+- **`type` is always `"done"`**: if the request reached you, every upstream step succeeded. Always set `"type": "done"`. Never use any other type value — no `"error"`, no `"partial"`, no `"pending"`.
 
-If something goes wrong and no spec can be built, return the minimal valid object: `{"spec": "", "tasks": []}`.
+If something goes wrong and no spec can be built, return the minimal valid object: `{"type": "done", "spec": "", "tasks": []}`.
 
 The output language must match the language of the input content (Russian if agents wrote in Russian, English if in English, etc.).
