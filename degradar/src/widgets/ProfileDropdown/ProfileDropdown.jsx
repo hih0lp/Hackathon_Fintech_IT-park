@@ -20,6 +20,11 @@ export default function ProfileDropdown() {
     }
 
     document.addEventListener('mousedown', handleClickOutside)
+    
+    // Check Yougile auth status on mount
+    const authStatus = yougile.isAuthenticated()
+    setIsYougileAuthenticated(authStatus)
+    
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
@@ -103,7 +108,7 @@ export default function ProfileDropdown() {
                 <line x1="20" y1="8" x2="20" y2="14"/>
                 <line x1="23" y1="11" x2="17" y2="11"/>
               </svg>
-              Привязать Agile
+              Привязать Yougile
             </button>
           )}
           <button className={styles.dropdownItem} onClick={handleLogout}>

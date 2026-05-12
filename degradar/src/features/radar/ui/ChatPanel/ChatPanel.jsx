@@ -2,6 +2,12 @@ import { useState } from 'react'
 import VoiceInput from '../VoiceInput/VoiceInput.jsx'
 import styles from './ChatPanel.module.css'
 
+// Convert **text** markdown to <strong>text</strong> HTML
+const formatBoldText = (text) => {
+  if (!text) return ''
+  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+}
+
 export default function ChatPanel({ messages, onSend, onAcceptTask, isProcessing, connectionStatus, isChatBlocked }) {
   const [input, setInput] = useState('')
 
@@ -58,7 +64,7 @@ export default function ChatPanel({ messages, onSend, onAcceptTask, isProcessing
                   </svg>
                 </div>
                 <div className={styles.bubble}>
-                  <div className={styles.text}>{msg.text}</div>
+                  <div className={styles.text} dangerouslySetInnerHTML={{ __html: formatBoldText(msg.text) }}></div>
                   {msg.suggestedTasks && msg.suggestedTasks.length > 0 && (
                     <div className={styles.taskSuggestions}>
                       <div className={styles.suggestionsTitle}>Рекомендуемые задачи:</div>

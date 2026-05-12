@@ -47,7 +47,7 @@ export default function RegisterPage() {
       await auth.register(formData.email, formData.password, formData.confirmPassword)
       console.log('Registration successful')
       localStorage.setItem('pendingEmail', formData.email)
-      navigate('/login')
+      navigate('/verification')
     } catch (err) {
       console.error('Registration error:', err)
       setError(err.message || 'Ошибка регистрации')

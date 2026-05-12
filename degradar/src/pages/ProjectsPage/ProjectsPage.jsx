@@ -69,6 +69,9 @@ export default function ProjectsPage() {
   // Load projects on mount
   useEffect(() => {
     loadProjects()
+    // Check Yougile auth status on mount
+    const authStatus = yougile.isAuthenticated()
+    setIsYougileAuthenticated(authStatus)
   }, [])
 
   async function loadProjects() {
@@ -143,8 +146,6 @@ export default function ProjectsPage() {
             formData.append('uploaded_files', fileObj.file)
           }
         })
-      } else {
-        formData.append('uploaded_files', null)
       }
 
       // Add sync_with_yougile flag
