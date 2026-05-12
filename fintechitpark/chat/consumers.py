@@ -6,6 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from .models import Chat, Message, LLMRequest
 from task.models import Task
 from .llm_service import call_llm
+from task.serializers import TaskSerializer
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -227,11 +228,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_chat_tasks(self):
-        """Получение списка задач чата"""
-        tasks = Task.objects.filter(chat_id=self.chat_id).values(
-            'id', 'title', 'active', 'created'
-        )
-        return list(tasks)
+        tasks = Task.objects.filter(chat_id=self.chat_id)
+        serializer = TaskSerializer(tasks, many=True)
+        return serializer.data
 
 
     @database_sync_to_async
