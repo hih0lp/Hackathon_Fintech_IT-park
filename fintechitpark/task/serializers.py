@@ -25,3 +25,10 @@ class TaskBulkCreateSerializer(serializers.Serializer):
         if not value:
             raise serializers.ValidationError("Список заголовков не может быть пустым")
         return value
+
+
+class DuplicateToYouGileSerializer(serializers.Serializer):
+    task_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        help_text="Список ID локальных задач для дублирования в YouGile"
+    )

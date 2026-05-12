@@ -14,6 +14,8 @@ class Project(models.Model):
     country = models.TextField(verbose_name="Страна проекта")
     created = models.DateTimeField(auto_now_add=True)
 
+    yougile_column_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="YouGile Column Key")
+
     class Meta:
         ordering = ['-created']
         verbose_name = "Проект"

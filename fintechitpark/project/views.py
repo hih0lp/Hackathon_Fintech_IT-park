@@ -1,12 +1,13 @@
 from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse, OpenApiParameter
-from rest_framework import generics, permissions, status, filters
+from rest_framework import generics, permissions, status, filters, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from .models import Project, ProjectFile
 from .serializers import ProjectSerializer, ProjectFileSerializer
+from .yougile_service import sync_project_with_yougile, YouGileAPIError
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -23,7 +24,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
     ),
     post=extend_schema(
         summary="Создать проект",
-        description="Создаёт новый проект. Можно загрузить несколько файлов, передав их в поле `uploaded_files`.",
+        description="Создаёт новый проект. Если `sync_with_yougile: true` и у пользователя есть API-ключ YouGile – создаётся зеркальный проект в YouGile.",
         request={
             'multipart/form-data': {
                 'type': 'object',
@@ -31,16 +32,16 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
                     'title': {'type': 'string'},
                     'description': {'type': 'string'},
                     'country': {'type': 'string'},
+                    'sync_with_yougile': {'type': 'boolean', 'default': False},
                     'uploaded_files': {
                         'type': 'array',
-                        'items': {'type': 'string', 'format': 'binary'},
-                        'description': 'Список файлов (можно выбрать несколько)'
+                        'items': {'type': 'string', 'format': 'binary'}
                     }
                 },
                 'required': ['title', 'description', 'country']
             }
         },
-        responses={201: ProjectSerializer, 400: OpenApiResponse(description="Ошибка валидации")}
+        responses={201: ProjectSerializer, 400: "Ошибка валидации или синхронизации"}
     )
 )
 class ProjectListCreateView(generics.ListCreateAPIView):
@@ -56,7 +57,21 @@ class ProjectListCreateView(generics.ListCreateAPIView):
             chats_count=Count('chats')).order_by('-created')
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        sync_flag = serializer.validated_data.get('sync_with_yougile', False)
+        if sync_flag:
+            api_key = self.request.user.profile.yougile_api_key
+            if not api_key:
+                raise serializers.ValidationError(
+                    {
+                        "sync_with_yougile": "У пользователя не настроен YouGile API-ключ. Сначала сохраните ключ через /api/yougile/auth/."}
+                )
+        project = serializer.save(user=self.request.user)
+        if sync_flag:
+            try:
+                column_id = sync_project_with_yougile(self.request.user, project)
+            except YouGileAPIError as e:
+                project.delete()
+                raise serializers.ValidationError({"sync_with_yougile": str(e)})
 
 
 @extend_schema_view(
