@@ -136,3 +136,29 @@
   border-color: var(--accent-blue);
   color: var(--text-primary);
 }
+
+.accountBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  transition: border-color 0.2s, color 0.2s;
+  cursor: pointer;
+}
+
+.accountBtn:hover {
+  border-color: var(--accent-blue);
+  color: var(--text-primary);
+}
+
+.accountBtn svg {
+  flex-shrink: 0;
+}

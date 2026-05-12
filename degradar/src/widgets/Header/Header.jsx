@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext.jsx'
+import ProfileDropdown from '../ProfileDropdown/ProfileDropdown.jsx'
 import styles from './Header.module.css'
 
 export default function Header({ project }) {
+  const { isAuthenticated } = useAuth()
   return (
     <header className={styles.header}>
       <div className={styles.left}>
@@ -33,12 +36,16 @@ export default function Header({ project }) {
 
       <nav className={styles.nav}>
         <a href="#" className={styles.navLink}>DOCUMENTATION</a>
-        <button className={styles.userBtn}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.5"/>
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-        </button>
+        {isAuthenticated ? (
+          <ProfileDropdown />
+        ) : (
+          <Link to="/login" className={styles.userBtn}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </Link>
+        )}
       </nav>
     </header>
   )

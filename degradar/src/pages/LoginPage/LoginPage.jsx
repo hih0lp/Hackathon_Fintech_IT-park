@@ -36,7 +36,12 @@ export default function LoginPage() {
       const response = await auth.login(formData.email, formData.password)
       // API returns tokens and user data on successful login
       if (response.access && response.refresh) {
-        login(response.access, response.refresh)
+        const userData = {
+          email: formData.email,
+          // Add other user data if available from response
+          ...(response.user && response.user)
+        }
+        login(response.access, response.refresh, userData)
         navigate('/projects')
       } else {
         setError('Неверный ответ от сервера')

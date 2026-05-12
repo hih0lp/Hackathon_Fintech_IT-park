@@ -6,6 +6,7 @@ import VerificationPage from '../pages/VerificationPage/VerificationPage.jsx'
 import ProjectsPage from '../pages/ProjectsPage/ProjectsPage.jsx'
 import ProjectPage from '../pages/ProjectPage/ProjectPage.jsx'
 import RadarPage from '../pages/RadarPage/RadarPage.jsx'
+import AccountPage from '../pages/AccountPage/AccountPage.jsx'
 import { AuthProvider } from '../context/AuthContext.jsx'
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:projectId" element={<ProjectPage />} />
           <Route path="/radar" element={<RadarPage />} />
+          <Route path="/account" element={<AccountPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

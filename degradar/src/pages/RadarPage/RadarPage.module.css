@@ -27,3 +27,36 @@
   flex-direction: column;
   overflow: hidden;
 }
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.emptyMessage {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.emptyMessage h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.emptyMessage p {
+  margin: 0;
+  font-size: 14px;
+}

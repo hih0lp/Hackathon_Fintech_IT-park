@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { projects } from '../../api/client'
 import { useAuth } from '../../context/AuthContext.jsx'
+import ProfileDropdown from '../../widgets/ProfileDropdown/ProfileDropdown.jsx'
 import styles from './ProjectsPage.module.css'
 
 const availableCountries = [
@@ -233,8 +234,7 @@ export default function ProjectsPage() {
           <span>REGRADAR</span>
         </Link>
         <div className={styles.navActions}>
-          <Link to="/profile" className={styles.navLink}>Профиль</Link>
-          <button className={styles.navLogout} onClick={handleLogout}>Выйти</button>
+          <ProfileDropdown />
         </div>
       </header>
 

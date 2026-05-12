@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { projects, chats } from '../../api/client'
+import { useAuth } from '../../context/AuthContext.jsx'
+import ProfileDropdown from '../../widgets/ProfileDropdown/ProfileDropdown.jsx'
 import styles from './ProjectPage.module.css'
 
 export default function ProjectPage() {
   const { projectId } = useParams()
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
   const [project, setProject] = useState(null)
   const [features, setFeatures] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -84,6 +87,7 @@ export default function ProjectPage() {
         </div>
         <div className={styles.navActions}>
           <span className={styles.projectTitle}>{project?.title || 'Загрузка...'}</span>
+          {isAuthenticated && <ProfileDropdown />}
         </div>
       </header>
 

@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
+import ProfileDropdown from '../../widgets/ProfileDropdown/ProfileDropdown.jsx'
 import styles from './LandingPage.module.css'
 
 const tickerItems = [
@@ -88,9 +89,12 @@ export default function LandingPage() {
         </nav>
         <div className={styles.navRight}>
           {isAuthenticated ? (
-            <button className={styles.btnPri} onClick={handleStart}>
-              Запустить <ArrowIcon />
-            </button>
+            <>
+              <ProfileDropdown />
+              <button className={styles.btnPri} onClick={handleStart}>
+                Запустить <ArrowIcon />
+              </button>
+            </>
           ) : (
             <>
               <Link to="/login" className={styles.btnGhost}>Войти</Link>
@@ -117,7 +121,7 @@ export default function LandingPage() {
         <span className={`${styles.blip} ${styles.blipPlum} ${styles.b5}`} />
         <span className={`${styles.blip} ${styles.b6}`} />
 
-        <div className={styles.heroInner}>
+        <div className={`${styles.heroInner} ${styles.animateSlideDownFadeIn}`}>
           <span className={styles.eyebrow}>
             <span className={styles.eyebrowDot} />
             Аналитика соответствия в реальном времени
@@ -167,10 +171,10 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className={styles.scrollHint}>
+        {/* <div className={styles.scrollHint}>
           <span>прокрутите</span>
           <span className={styles.scrollLine} />
-        </div>
+        </div> */}
       </section>
 
       {/* TICKER */}
@@ -183,7 +187,7 @@ export default function LandingPage() {
       </div>
 
       {/* FEATURES */}
-      <section className={styles.features} id="features">
+      <section className={`${styles.features} ${styles.animateSlideDownFadeInDelay1}`} id="features">
         <div className={styles.sectionHead}>
           <div>
             <span className={styles.kicker}>Почему REGRADAR</span>
@@ -195,9 +199,9 @@ export default function LandingPage() {
             Четыре инструмента, которые превращают регуляторное ревью из стопора в спокойную инфраструктуру.
           </p>
         </div>
-        <div className={styles.featGrid}>
+        <div className={`${styles.featGrid}`}>
           {features.map((f, i) => (
-            <article key={i} className={`${styles.feat} ${styles[f.variant]}`}>
+            <article key={i} className={`${styles.feat} ${styles[f.variant]} ${styles[`animateSlideDownFadeInDelay${i + 1}`]}`}>
               <div className={styles.featIc}>{f.icon}</div>
               <span className={styles.featNum}>{f.num}</span>
               <h3>{f.title}</h3>
@@ -208,7 +212,7 @@ export default function LandingPage() {
       </section>
 
       {/* HOW */}
-      <section className={styles.how} id="how">
+      <section className={`${styles.how} ${styles.animateSlideDownFadeInDelay2}`} id="how">
         <div className={styles.howInner}>
           <div className={styles.sectionHead}>
             <div>
@@ -221,18 +225,18 @@ export default function LandingPage() {
               Без интеграций по два месяца. Просто вставьте описание фичи — остальное соберёт радар.
             </p>
           </div>
-          <div className={styles.steps}>
-            <div className={styles.step}>
+          <div className={`${styles.steps}`}>
+            <div className={`${styles.step} ${styles.animateSlideDownFadeInDelay1}`}>
               <div className={`${styles.stepN} ${styles.stepN1}`}>01</div>
               <h4>Вставьте описание</h4>
               <p>Любой формат — Jira-тикет, Notion-страница, заметки со звонка с PM.</p>
             </div>
-            <div className={styles.step}>
+            <div className={`${styles.step} ${styles.animateSlideDownFadeInDelay2}`}>
               <div className={`${styles.stepN} ${styles.stepN2}`}>02</div>
               <h4>ИИ читает законы за вас</h4>
               <p>Сверяем с 18+ регуляторными фреймворками и базой судебных прецедентов.</p>
             </div>
-            <div className={styles.step}>
+            <div className={`${styles.step} ${styles.animateSlideDownFadeInDelay3}`}>
               <div className={`${styles.stepN} ${styles.stepN3}`}>03</div>
               <h4>Получите план</h4>
               <p>Чек-лист, задачи в Jira, цитаты статей закона, шаблоны DPIA — в одном окне.</p>
@@ -257,7 +261,7 @@ export default function LandingPage() {
       </section>
 
       {/* FINAL CTA */}
-      <section className={styles.final}>
+      <section className={`${styles.final} ${styles.animateSlideDownFadeInDelay3}`}>
         <h3 className={styles.finalTitle}>
           Начните <em>бесплатный</em> анализ за 30 секунд.
         </h3>

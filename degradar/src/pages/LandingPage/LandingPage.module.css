@@ -892,6 +892,43 @@
   flex-shrink: 0;
 }
 
+/* ======= ANIMATIONS ======= */
+@keyframes slideDownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animateSlideDownFadeIn {
+  animation: slideDownFadeIn 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animateSlideDownFadeInDelay1 {
+  animation: slideDownFadeIn 0.8s ease-out 0.1s forwards;
+  opacity: 0;
+}
+
+.animateSlideDownFadeInDelay2 {
+  animation: slideDownFadeIn 0.8s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+.animateSlideDownFadeInDelay3 {
+  animation: slideDownFadeIn 0.8s ease-out 0.3s forwards;
+  opacity: 0;
+}
+
+.animateSlideDownFadeInDelay4 {
+  animation: slideDownFadeIn 0.8s ease-out 0.4s forwards;
+  opacity: 0;
+}
+
 .iconLg {
   width: 20px;
   height: 20px;

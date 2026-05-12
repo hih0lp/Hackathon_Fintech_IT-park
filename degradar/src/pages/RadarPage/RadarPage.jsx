@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import styles from './RadarPage.module.css'
 import ChatPanel from '../../features/radar/ui/ChatPanel/ChatPanel.jsx'
 import TodoPanel from '../../features/radar/ui/TodoPanel/TodoPanel.jsx'
@@ -6,18 +7,63 @@ import ChatSelector from '../../features/radar/ui/ChatSelector/ChatSelector.jsx'
 import Header from '../../widgets/Header/Header.jsx'
 import { tasksMock } from '../../features/radar/api/tasksMock.js'
 import { mockProject } from '../../shared/mocks/regradar.js'
-
-// Mock chats data
-const mockChats = [
-  { id: 1, name: 'GDPR Compliance', date: 'Сегодня' },
-  { id: 2, name: 'AML Risk Assessment', date: 'Вчера' },
-  { id: 3, name: 'PSD2 Integration', date: '2 дня назад' },
-]
+import { chats } from '../../api/client'
 
 export default function RadarPage() {
+  const [searchParams] = useSearchParams()
   const [messages, setMessages] = useState([])
   const [tasks, setTasks] = useState([])
-  const [selectedChat, setSelectedChat] = useState(mockChats[0])
+  const [features, setFeatures] = useState([])
+  const [selectedChat, setSelectedChat] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  
+  const projectId = searchParams.get('project')
+  const featureId = searchParams.get('feature')
+
+  // Load features for the project
+  useEffect(() => {
+    if (!projectId) {
+      setIsLoading(false)
+      return
+    }
+    
+    const loadFeatures = async () => {
+      try {
+        const response = await chats.list({ project: projectId })
+        const featuresData = response.results || []
+        setFeatures(featuresData)
+        
+        // Format features for display
+        const formattedFeatures = featuresData.map(feature => ({
+          ...feature,
+          name: feature.name || `Фича ${feature.id}`,
+          date: feature.created_at ? new Date(feature.created_at).toLocaleDateString('ru-RU', { 
+            day: 'numeric', 
+            month: 'short' 
+          }) : 'Сегодня'
+        }))
+        
+        setFeatures(formattedFeatures)
+        
+        // Select the requested feature or the first one
+        if (featureId) {
+          const requestedFeature = formattedFeatures.find(f => f.id === parseInt(featureId))
+          setSelectedChat(requestedFeature || formattedFeatures[0])
+        } else {
+          setSelectedChat(formattedFeatures[0])
+        }
+      } catch (error) {
+        console.error('Failed to load features:', error)
+        // Fallback to empty state
+        setFeatures([])
+        setSelectedChat(null)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    loadFeatures()
+  }, [projectId, featureId])
 
   // Load initial tasks from mock
   useEffect(() => {
@@ -103,17 +149,30 @@ export default function RadarPage() {
       <div className={styles.body}>
         {/* Main chat area */}
         <main className={styles.main}>
-          <ChatSelector 
-            chats={mockChats}
-            selectedChat={selectedChat}
-            onSelectChat={setSelectedChat}
-          />
-          <ChatPanel 
-            messages={messages} 
-            onSend={handleSendMessage}
-            onAcceptTask={handleAcceptTask}
-            onRejectTask={handleRejectTask}
-          />
+          {isLoading ? (
+            <div className={styles.loading}>Загрузка фич проекта...</div>
+          ) : features.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyMessage}>
+                <h3>Нет фич в проекте</h3>
+                <p>Создайте фичу в проекте, чтобы начать анализ</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <ChatSelector 
+                chats={features}
+                selectedChat={selectedChat}
+                onSelectChat={setSelectedChat}
+              />
+              <ChatPanel 
+                messages={messages} 
+                onSend={handleSendMessage}
+                onAcceptTask={handleAcceptTask}
+                onRejectTask={handleRejectTask}
+              />
+            </>
+          )}
         </main>
 
         {/* Right todo panel */}
