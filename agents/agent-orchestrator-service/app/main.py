@@ -66,7 +66,7 @@ async def orchestrate(
         filter_action = str(filter_result.get("action", "")).strip().lower()
 
         if filter_action == "stop":
-            yield _sse({"type": "done", "result": {}})
+            yield _sse({"blocked": True})
             return
 
         if filter_action != "ok":
@@ -93,7 +93,7 @@ async def orchestrate(
             questions = ambiguity_result.get("questions", [])
             if not isinstance(questions, list):
                 questions = [str(questions)]
-            yield _sse({"type": "done", "result": {"questions": questions}})
+            yield _sse({"clarify": True, "questions": questions})
             return
 
         if action != "patch":

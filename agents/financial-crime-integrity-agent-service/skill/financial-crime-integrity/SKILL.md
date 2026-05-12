@@ -37,6 +37,20 @@ If the jurisdiction is ambiguous or multiple countries are mentioned — apply t
 
 ---
 
+## Step 0 — Mini research: does this feature touch financial crime vectors?
+
+Before any analysis, honestly answer:
+**"Does this feature involve money flows, user identity verification, or interactions that could be exploited for financial crime?"**
+
+Look for signals in `msg` and `context`: deposits, withdrawals, transfers, top-ups, payments, onboarding, KYC, identity documents, sanctions screening, fraud detection, transaction monitoring, AML, PEP, cross-border flows, wallet funding, crypto transactions.
+
+If the feature is purely UI/UX, content management, reporting dashboards, or internal tooling with no money movement or identity verification — this domain does not apply.
+Return `{"spec": "", "tasks": []}` and stop.
+
+If signals exist — proceed to the next steps. Analyze strictly within the 5 sub-domains below. Anything outside them — silently discard.
+
+---
+
 ## Step 1 — Sub-domain Analysis
 
 Determine which of the following sub-domains are relevant to the feature in context:
@@ -159,11 +173,10 @@ It is valid and expected that in some cases **zero vulnerabilities** pass this t
 
 ## Step 6 — Research & Generate Tasks
 
-After scoring, research the specific feature and context to generate improvement tasks for the `tasks` field.
-
-Tasks are **not** about fixing vulnerabilities — those go in `spec`. Tasks are forward-looking enhancements that raise the overall compliance, fraud-resistance, and operational maturity of the feature.
-
-Research the context and generate 3–7 specific improvement suggestions. No generic advice.
+Generate up to **3 improvement tasks** strictly within the Financial Crime & Integrity domain.
+Tasks are not fixes for `spec` vulnerabilities — they are forward-looking enhancements.
+Each task: 1 sentence, ≤ 12 words, no generic advice.
+Do NOT include tasks from other domains (data privacy, consumer protection, payments, AI governance) — silently ignore them.
 
 ---
 
@@ -187,8 +200,9 @@ Each numbered item is one line: **title — description. Recommendation.**
 If no vulnerabilities exceed 7.5 — domain name only, no numbered items.
 
 ### `tasks` field
-An array of short improvement suggestions, one sentence each.
-Language matches `msg`. No IDs, no scores, no explanations — just the suggestion itself.
+Array of up to **3** short improvement suggestions, one sentence each (≤ 12 words).
+Language matches `msg`. No IDs, no scores, no explanations — just the suggestion.
+Strictly Financial Crime domain only. If nothing applies — `[]`.
 
 ---
 
