@@ -1339,7 +1339,7 @@
     transform: translateY(0);
 }
 
-/* Checkbox and Bind Agile Styles */
+/* Checkbox and Bind Yougile Styles */
 .checkboxLabel {
     display: flex;
     align-items: center;
@@ -1381,7 +1381,7 @@
     font-style: italic;
 }
 
-.bindAgileBtn {
+.bindYougileBtn {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1397,14 +1397,14 @@
     margin-top: 8px;
 }
 
-.bindAgileBtn:hover {
+.bindYougileBtn:hover {
     background: linear-gradient(135deg, rgba(34, 77, 71, 0.15) 0%, rgba(34, 77, 71, 0.08) 100%);
     border-color: rgba(34, 77, 71, 0.3);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(34, 77, 71, 0.1);
 }
 
-.bindAgileBtn svg {
+.bindYougileBtn svg {
     flex-shrink: 0;
 }
 

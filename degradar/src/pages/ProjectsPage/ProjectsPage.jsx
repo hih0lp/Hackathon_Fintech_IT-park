@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { projects, yougile } from '../../api/client'
 import { useAuth } from '../../context/AuthContext.jsx'
 import ProfileDropdown from '../../widgets/ProfileDropdown/ProfileDropdown.jsx'
-import AgileModal from '../../widgets/AgileModal/AgileModal.jsx'
+import YougileModal from '../../widgets/AgileModal/AgileModal.jsx'
 import styles from './ProjectsPage.module.css'
 
 const availableCountries = [
@@ -54,7 +54,7 @@ export default function ProjectsPage() {
   })
   const [selectedCountry, setSelectedCountry] = useState('')
   const [showCountryDropdown, setShowCountryDropdown] = useState(false)
-  const [showAgileModal, setShowAgileModal] = useState(false)
+  const [showYougileModal, setShowYougileModal] = useState(false)
   const [isYougileAuthenticated, setIsYougileAuthenticated] = useState(yougile.isAuthenticated())
   const [yougileAuth, setYougileAuth] = useState({
     login: '',
@@ -293,18 +293,18 @@ export default function ProjectsPage() {
     setIsYougileAuthenticated(false)
   }
 
-  const handleBindAgile = () => {
-    setShowAgileModal(true)
+  const handleBindYougile = () => {
+    setShowYougileModal(true)
   }
 
-  const handleAgileSubmit = async (formData) => {
+  const handleYougileSubmit = async (formData) => {
     try {
       await yougile.authenticate(formData.username, formData.password, formData.companyId)
       yougile.setAuthenticated(true)
       setIsYougileAuthenticated(true)
-      setShowAgileModal(false)
+      setShowYougileModal(false)
     } catch (error) {
-      console.error('Failed to bind Agile:', error)
+      console.error('Failed to bind Yougile:', error)
       throw error
     }
   }
@@ -702,8 +702,8 @@ export default function ProjectsPage() {
                 {!isYougileAuthenticated && (
                   <button
                     type="button"
-                    className={styles.bindAgileBtn}
-                    onClick={handleBindAgile}
+                    className={styles.bindYougileBtn}
+                    onClick={handleBindYougile}
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                       <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -711,7 +711,7 @@ export default function ProjectsPage() {
                       <line x1="20" y1="8" x2="20" y2="14"/>
                       <line x1="23" y1="11" x2="17" y2="11"/>
                     </svg>
-                    Привязать Agile
+                    Привязать Yougile
                   </button>
                 )}
               </div>
@@ -729,10 +729,10 @@ export default function ProjectsPage() {
         </div>
       )}
     
-    <AgileModal
-      isOpen={showAgileModal}
-      onClose={() => setShowAgileModal(false)}
-      onSubmit={handleAgileSubmit}
+    <YougileModal
+      isOpen={showYougileModal}
+      onClose={() => setShowYougileModal(false)}
+      onSubmit={handleYougileSubmit}
     />
   </div>
   )

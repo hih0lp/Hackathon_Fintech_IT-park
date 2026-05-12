@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import styles from './AgileModal.module.css'
 
-export default function AgileModal({ isOpen, onClose, onSubmit }) {
+export default function YougileModal({ isOpen, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
     username: '',
     companyId: '',
@@ -43,7 +43,7 @@ export default function AgileModal({ isOpen, onClose, onSubmit }) {
     const newErrors = {}
     
     if (!formData.username.trim()) {
-      newErrors.username = 'Имя пользователя обязательно'
+      newErrors.username = 'Email пользователя обязательно'
     }
     
     if (!formData.companyId.trim()) {
@@ -77,8 +77,8 @@ export default function AgileModal({ isOpen, onClose, onSubmit }) {
       console.log('onSubmit completed successfully')
       onClose()
     } catch (error) {
-      console.error('Failed to bind Agile:', error)
-      setErrors({ submit: 'Ошибка при привязке Agile' })
+      console.error('Failed to bind Yougile:', error)
+      setErrors({ submit: 'Ошибка при привязке Yougile' })
     } finally {
       setIsSubmitting(false)
     }
@@ -90,7 +90,7 @@ export default function AgileModal({ isOpen, onClose, onSubmit }) {
     <div className={styles.modalOverlay}>
       <div className={styles.modal} ref={modalRef}>
         <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>Привязать Agile</h2>
+          <h2 className={styles.modalTitle}>Привязать Yougile</h2>
           <button 
             className={styles.modalClose} 
             onClick={onClose}
@@ -106,7 +106,7 @@ export default function AgileModal({ isOpen, onClose, onSubmit }) {
         <form onSubmit={handleSubmit} className={styles.modalForm}>
           <div className={styles.formGroup}>
             <label htmlFor="username" className={styles.formLabel}>
-              Имя пользователя
+              Email пользователя
             </label>
             <input
               type="text"
@@ -114,7 +114,7 @@ export default function AgileModal({ isOpen, onClose, onSubmit }) {
               name="username"
               value={formData.username}
               onChange={handleChange}
-              placeholder="Введите имя пользователя"
+              placeholder="Введите Email пользователя"
               className={`${styles.formInput} ${errors.username ? styles.error : ''}`}
               disabled={isSubmitting}
             />
