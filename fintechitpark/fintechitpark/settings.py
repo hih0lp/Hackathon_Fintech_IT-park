@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'user',
     'project',
     'chat',
-    'task'
+    'task',
+    'custom_agents'
 ]
 
 MIDDLEWARE = [

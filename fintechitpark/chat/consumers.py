@@ -4,6 +4,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
 from .models import Chat, Message, LLMRequest
+from task.models import Task
 from .llm_service import call_llm
 
 
@@ -33,8 +34,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
 
-        # Отправляем историю сообщений
         await self.send_history()
+
+        await self.send_chat_info()
+
+        await self.send_chat_tasks()
 
     async def disconnect(self, close_code):
         """При отключении WebSocket"""
@@ -81,10 +85,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             context
         )
 
+        custom_agents = await self.get_project_agents()
+        print(custom_agents)
         # Запускаем задачу в Dramatiq
         # Используем database_sync_to_async для синхронного вызова
         try:
-            call_llm.send(llm_req.id, self.chat_id, user_message, context)
+            call_llm.send(llm_req.id, self.chat_id, user_message, context, custom_agents)
         except Exception as e:
             await self.send(text_data=json.dumps({
                 "error": e
@@ -120,6 +126,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'messages': messages
         }))
 
+    async def send_chat_info(self):
+        """Отправка информации о чате"""
+        chat_info = await self.get_chat_info()
+        await self.send(text_data=json.dumps({
+            'type': 'chat_info',
+            'data': chat_info
+        }))
+
+    async def send_chat_tasks(self):
+        """Отправка списка задач чата"""
+        tasks = await self.get_chat_tasks()
+        await self.send(text_data=json.dumps({
+            'type': 'tasks',
+            'tasks': tasks
+        }))
+
     # async def send_chat_message(self, sender, text, request_id=None):
     #     """Отправка сообщения в чат"""
     #     await self.send(text_data=json.dumps({
@@ -138,6 +160,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     # Database operations
+    @database_sync_to_async
+    def get_project_agents(self):
+        """Получить список кастомных агентов проекта в формате для микросервиса"""
+        chat = Chat.objects.get(id=self.chat_id)
+        agents = chat.project.agents.all()
+        result = [
+            {
+                "name": agent.name,
+                "skill": agent.skill,
+            }
+            for agent in agents
+        ]
+        return result
+
     @database_sync_to_async
     def check_chat_access(self, user, chat_id):
         """Проверка доступа к чату"""
@@ -180,6 +216,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return LLMRequest.objects.get(id=request_id)
         except LLMRequest.DoesNotExist:
             return None
+
+    @database_sync_to_async
+    def get_chat_info(self):
+        """Получение информации о чате"""
+        chat = Chat.objects.get(id=self.chat_id)
+        return {
+            'id': chat.id,
+            'name': chat.name,
+            'available': chat.available,
+            'created': chat.created.isoformat()
+        }
+
+    @database_sync_to_async
+    def get_chat_tasks(self):
+        """Получение списка задач чата"""
+        tasks = Task.objects.filter(chat_id=self.chat_id).values(
+            'id', 'title', 'active', 'created'
+        )
+        return list(tasks)
+
 
     @database_sync_to_async
     def get_chat_history(self, chat_id):
