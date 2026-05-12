@@ -1,6 +1,6 @@
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse, OpenApiParameter
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, filters, permissions
+from rest_framework import generics, filters, permissions, status
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from .llm_service import call_llm
 from .models import Chat, Message, LLMRequest
 from .serializers import ChatSerializer, MessageSerializer
+from fintechitpark import settings
 
 
 @extend_schema_view(
@@ -193,3 +194,40 @@ class LLMRequestStatusView(APIView):
         elif llm_req.status == 'failed':
             response_data['error'] = llm_req.error_message
         return Response(response_data)
+
+
+class ChatNewVersionView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        summary="Создать новую версию чата",
+        description="Создаёт новый чат, который наследует контекст (историю) текущего чата. Новая версия будет открыта для общения.",
+        responses={201: ChatSerializer, 400: OpenApiResponse(description="Превышен лимит версий или ошибка")},
+        parameters=[
+            OpenApiParameter(name='chat_id', description='ID исходного чата', required=True, type=int, location='path'),
+        ]
+    )
+    def post(self, request, chat_id):
+        original_chat = get_object_or_404(Chat, id=chat_id, project__user=request.user)
+
+        max_versions = getattr(settings, 'MAX_CHAT_VERSIONS', 10)
+        version_count = 1
+        current = original_chat
+        while current.parent:
+            version_count += 1
+            current = current.parent
+        if version_count >= max_versions:
+            return Response(
+                {"detail": f"Достигнуто максимальное количество версий чата ({max_versions})."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        new_name = f"{original_chat.name} (v{original_chat.version_number + 1})"
+        new_chat = Chat.objects.create(
+            project=original_chat.project,
+            name=new_name,
+            available=True,
+            parent=original_chat
+        )
+        serializer = ChatSerializer(new_chat, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

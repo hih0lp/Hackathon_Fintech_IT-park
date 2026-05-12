@@ -186,17 +186,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_chat_context(self, chat_id):
         """Получение контекста чата"""
         chat = Chat.objects.get(id=chat_id)
-        messages = chat.messages.order_by('created_at')
-
-        context = "История диалога:\n"
-        for msg in messages:
-            context += f"{msg.sender}: {msg.text}\n"
-
-        context += f"\nИнформация о проекте:\n"
-        context += f"Название: {chat.project.title}\n"
-        context += f"Описание: {chat.project.description}\n"
-        context += f"Страна: {chat.project.country}"
-
+        full_history = chat.get_full_context()
+        context = (
+            f"{full_history}\n\n"
+            f"Информация о проекте:\n"
+            f"Название: {chat.project.title}\n"
+            f"Описание: {chat.project.description}\n"
+            f"Страна: {chat.project.country}"
+        )
         return context
 
     @database_sync_to_async
