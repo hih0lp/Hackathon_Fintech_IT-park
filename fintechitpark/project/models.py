@@ -10,8 +10,8 @@ class Project(models.Model):
         verbose_name="Владелец проекта"
     )
     title = models.CharField(max_length=50, verbose_name="Название проекта")
-    description = models.TextField(max_length=255, verbose_name="Описание проекта")
-    country = models.CharField(max_length=50, verbose_name="Страна проекта")
+    description = models.TextField(verbose_name="Описание проекта")
+    country = models.TextField(verbose_name="Страна проекта")
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
