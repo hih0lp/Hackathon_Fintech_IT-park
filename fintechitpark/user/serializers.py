@@ -3,6 +3,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 
 
+class YouGileAuthSerializer(serializers.Serializer):
+    login = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
+    companyId = serializers.CharField(required=True)
+
+
 class RegisterRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, validators=[validate_password])

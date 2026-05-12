@@ -1,4 +1,6 @@
+import requests
 from drf_spectacular.utils import extend_schema, OpenApiResponse
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,10 +12,64 @@ from .serializers import (
     VerifyCodeSerializer,
     LoginSerializer,
     UserSerializer,
-    EmailSerializer,
+    EmailSerializer, YouGileAuthSerializer,
 )
 from .services import create_inactive_user, send_verification_code, activate_user
 from .models import EmailVerificationCode
+
+
+@extend_schema(
+    request=YouGileAuthSerializer,
+    responses={
+        200: OpenApiResponse(description='API-ключ YouGile успешно сохранён.',
+                             response={'type': 'object', 'properties': {'detail': {'type': 'string'}}}),
+        400: OpenApiResponse(description='Не удалось получить API-ключ. Проверьте ответ YouGile.'),
+    }
+)
+class YouGileAuthView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = YouGileAuthSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        login = serializer.validated_data['login']
+        password = serializer.validated_data['password']
+        company_id = serializer.validated_data['companyId']
+
+        url = "https://ru.yougile.com/api-v2/auth/keys"
+        payload = {
+            "login": login,
+            "password": password,
+            "companyId": company_id
+        }
+
+        try:
+            response = requests.post(url, json=payload, timeout=10)
+            response.raise_for_status()
+            api_key = response.json().get('key')
+
+            if not api_key:
+                return Response({
+                    'success': False,
+                    'error': 'Не удалось получить API-ключ. Проверьте ответ YouGile.',
+                    'yougile_response': response.json()
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            profile = request.user.profile
+            profile.yougile_api_key = api_key
+            profile.save()
+
+            return Response({
+                'success': True,
+                'message': 'API-ключ YouGile успешно сохранён.'
+            }, status=status.HTTP_200_OK)
+
+        except requests.exceptions.RequestException as e:
+            return Response({
+                'success': False,
+                'error': f'Ошибка при запросе к YouGile: {str(e)}'
+            }, status=status.HTTP_502_BAD_GATEWAY)
 
 
 class RegisterRequestView(APIView):
