@@ -45,7 +45,7 @@ Before any analysis, honestly answer:
 Look for signals in `msg` and `context`: deposits, withdrawals, transfers, top-ups, payments, onboarding, KYC, identity documents, sanctions screening, fraud detection, transaction monitoring, AML, PEP, cross-border flows, wallet funding, crypto transactions.
 
 If the feature is purely UI/UX, content management, reporting dashboards, or internal tooling with no money movement or identity verification — this domain does not apply.
-Return `{"spec": "", "tasks": []}` and stop.
+Return `{"spec": "Финансовые преступления и интеграции\n", "tasks": []}` and stop.
 
 If signals exist — proceed to the next steps. Analyze strictly within the 5 sub-domains below. Anything outside them — silently discard.
 

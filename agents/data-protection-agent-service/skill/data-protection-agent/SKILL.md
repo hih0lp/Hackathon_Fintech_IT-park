@@ -52,7 +52,7 @@ Before any analysis, honestly answer:
 Look for signals in `msg` and `context`: user data, emails, names, addresses, IDs, behavioral tracking, cookies, consent, profiling, analytics, biometrics, payment data tied to identity, cross-border data transfers, third-party data sharing.
 
 If the feature is purely internal infrastructure, aggregated/anonymous data pipelines, or system-to-system integrations with no personal data involved — this domain does not apply.
-Return `{"spec": "", "tasks": []}` and stop.
+Return `{"spec": "Защита данных и конфиденциальность\n", "tasks": []}` and stop.
 
 If signals exist — proceed to the next steps. Analyze strictly within the 6 subdomains above. Anything outside them — silently discard.
 
