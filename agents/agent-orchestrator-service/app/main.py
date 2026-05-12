@@ -178,7 +178,7 @@ async def orchestrate(
                     result = future.result()
                     if name == "__custom_agents__" and isinstance(result, dict):
                         if not result:
-                            logger.warning("Custom-agents service returned empty result — all custom agents likely failed internally")
+                            logger.warning("Custom-agents service returned empty result (no errors reported)")
                             errors["custom_agents"] = "Custom-agents service returned empty result"
                             yield _sse({"type": "agent_error", "agent": "custom_agents", "detail": "Custom-agents service returned empty result"})
                         else:

@@ -46,6 +46,8 @@ def _extract_sse_result(response_stream) -> Any:
     """Read SSE stream and return the value from the 'done' event's result field."""
     full_text_parts: list[str] = []
     done_result: Any = None
+    done_errors: dict[str, str] = {}
+    agent_errors: list[str] = []
     found_done = False
 
     for raw_line in response_stream:
@@ -70,13 +72,23 @@ def _extract_sse_result(response_stream) -> Any:
             full_text_parts.append(str(event.get("text", "")))
         elif event_type == "done":
             done_result = event.get("result")
+            maybe_errs = event.get("errors")
+            if isinstance(maybe_errs, dict):
+                done_errors = {str(k): str(v) for k, v in maybe_errs.items()}
             found_done = True
+        elif event_type == "agent_error":
+            agent = str(event.get("agent", "?"))
+            detail = str(event.get("detail", "Unknown agent error"))
+            agent_errors.append(f"{agent}: {detail}")
         elif event_type == "error":
             detail = str(event.get("detail", "Unknown upstream error"))
             raise AgentCallError(detail)
 
     if found_done:
-        # result может быть dict (уже распарсен) или строкой
+        # пустой dict + были agent_error → возвращаем ошибку, не молчаливый {}
+        if isinstance(done_result, dict) and not done_result and (agent_errors or done_errors):
+            err_lines = agent_errors + [f"{k}: {v}" for k, v in done_errors.items()]
+            raise AgentCallError("All sub-agents failed: " + " | ".join(err_lines))
         if isinstance(done_result, dict):
             return done_result
         return done_result  # None или примитив — вернём как есть

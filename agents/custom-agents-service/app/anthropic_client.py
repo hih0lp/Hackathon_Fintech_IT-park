@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import re
 from typing import Any, AsyncIterator
 
@@ -9,6 +10,9 @@ import anthropic
 
 from .config import Settings
 from .schemas import CustomAgentDef
+
+
+logger = logging.getLogger("custom-agents")
 
 
 def _sse(data: dict[str, object]) -> str:
@@ -49,6 +53,7 @@ async def _run_single_agent(
     context: Any,
     settings: Settings,
 ) -> tuple[str, Any]:
+    logger.info("Agent start: %s | model=%s", agent.name, settings.anthropic_model)
     client = anthropic.AsyncAnthropic(
         api_key=settings.anthropic_api_key,
         base_url=settings.anthropic_base_url,
@@ -56,15 +61,25 @@ async def _run_single_agent(
 
     user_payload = json.dumps({"msg": msg, "context": context}, ensure_ascii=False)
 
-    message = await client.messages.create(
-        model=settings.anthropic_model,
-        max_tokens=settings.anthropic_max_tokens,
-        temperature=settings.anthropic_temperature,
-        system=agent.skill,
-        messages=[{"role": "user", "content": user_payload}],
-    )
+    try:
+        message = await client.messages.create(
+            model=settings.anthropic_model,
+            max_tokens=settings.anthropic_max_tokens,
+            temperature=settings.anthropic_temperature,
+            system=agent.skill,
+            messages=[{"role": "user", "content": user_payload}],
+        )
+    except Exception as exc:
+        logger.exception("Agent %s — Anthropic call failed: %s", agent.name, exc)
+        raise
 
     raw_text = message.content[0].text if message.content else ""
+    logger.info(
+        "Agent done: %s | stop_reason=%s | text_len=%d",
+        agent.name,
+        getattr(message, "stop_reason", "?"),
+        len(raw_text),
+    )
     parsed = _try_parse_json(raw_text)
     return agent.name, parsed
 
@@ -75,8 +90,12 @@ async def stream_custom_agents(
     context: Any,
     settings: Settings,
 ) -> AsyncIterator[str]:
+    logger.info("stream_custom_agents called with %d agents: %s",
+                len(agents), [a.name for a in agents])
+
     if not agents:
-        yield _sse({"type": "done", "result": {}})
+        logger.warning("No custom agents to run")
+        yield _sse({"type": "done", "result": {}, "errors": {}})
         return
 
     tasks = {
@@ -100,7 +119,8 @@ async def stream_custom_agents(
                 yield _sse({"type": "agent", "agent": name, "result": result})
             except Exception as exc:
                 errors[name] = str(exc)
+                logger.error("Agent %s failed: %s", name, exc)
                 yield _sse({"type": "agent_error", "agent": name, "detail": str(exc)})
 
-    done_payload: dict[str, Any] = dict(merged)
-    yield _sse({"type": "done", "result": done_payload})
+    logger.info("All agents finished | success=%d | errors=%d", len(merged), len(errors))
+    yield _sse({"type": "done", "result": merged, "errors": errors})
