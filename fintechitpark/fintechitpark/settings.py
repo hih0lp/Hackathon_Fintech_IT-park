@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_spectacular',
     'drf_spectacular_sidecar',
+    'channels',
+    'dramatiq',
+    'django_dramatiq',
     'django_filters',
     'corsheaders',
     'user',
@@ -80,9 +83,33 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'fintechitpark.wsgi.application'
+ASGI_APPLICATION = 'fintechitpark.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
+DRAMATIQ_BROKER = {
+    "BROKER": "dramatiq.brokers.redis.RedisBroker",
+    "OPTIONS": {
+        "url": "redis://127.0.0.1:6379/0",
+    },
+    "MIDDLEWARE": [
+        "dramatiq.middleware.Retries",
+        "django_dramatiq.middleware.DbConnectionsMiddleware",
+    ]
+}
+
+DRAMATIQ_WORKER_PROCESSES = 1
+DRAMATIQ_WORKER_THREADS = 20
 
 DATABASES = {
     'default': {
