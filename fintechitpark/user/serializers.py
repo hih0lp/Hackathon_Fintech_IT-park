@@ -36,9 +36,16 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    has_yougile_key = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'date_joined')
+        fields = ('id', 'username', 'email', 'date_joined', 'has_yougile_key')
+
+    def get_has_yougile_key(self, obj):
+        if hasattr(obj, 'profile') and obj.profile.yougile_api_key:
+            return True
+        return False
 
 
 class EmailSerializer(serializers.Serializer):
