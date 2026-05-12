@@ -17,6 +17,8 @@ services:
       - consumer-protection-agent
       - ai-governance-analyst-v3-agent
       - crypto-domain-analyzer-agent
+      - result-aggregator-agent
+      - custom-agents-service
     restart: unless-stopped
 
   filter-content-agent:
@@ -137,4 +139,33 @@ services:
       SKILL_DIR: ${CRYPTO_DOMAIN_SKILL_DIR}
     expose:
       - "8087"
+    restart: unless-stopped
+
+  result-aggregator-agent:
+    build:
+      context: ../result-aggregator-service
+      dockerfile: Dockerfile
+    container_name: result-aggregator-agent
+    env_file:
+      - .env
+    environment:
+      MAX_TOKENS: ${RESULT_AGGREGATOR_MAX_TOKENS}
+      ANTHROPIC_TEMPERATURE: ${RESULT_AGGREGATOR_TEMPERATURE}
+      SKILL_DIR: ${RESULT_AGGREGATOR_SKILL_DIR}
+    expose:
+      - "8089"
+    restart: unless-stopped
+
+  custom-agents-service:
+    build:
+      context: ../custom-agents-service
+      dockerfile: Dockerfile
+    container_name: custom-agents-service
+    env_file:
+      - .env
+    environment:
+      MAX_TOKENS: ${CUSTOM_AGENTS_MAX_TOKENS}
+      ANTHROPIC_TEMPERATURE: ${CUSTOM_AGENTS_TEMPERATURE}
+    expose:
+      - "8091"
     restart: unless-stopped

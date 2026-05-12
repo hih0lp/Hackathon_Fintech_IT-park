@@ -36,6 +36,7 @@ async def orchestrate(
     msg: Annotated[str, Form(min_length=1)],
     context_text: Annotated[str | None, Form()] = None,
     context_files: Annotated[list[UploadFile] | None, File()] = None,
+    custom_agents: Annotated[str | None, Form()] = None,
 ) -> StreamingResponse:
     parts: list[str] = []
     if context_text:
@@ -100,10 +101,23 @@ async def orchestrate(
             yield _sse({"type": "error", "detail": f"Unexpected ambiguity action: {action!r}"})
             return
 
+        custom_agent_defs: list[dict[str, str]] = []
+        if custom_agents:
+            try:
+                custom_agent_defs = json.loads(custom_agents)
+                if not isinstance(custom_agent_defs, list):
+                    custom_agent_defs = []
+            except json.JSONDecodeError:
+                yield _sse({"type": "error", "detail": "Invalid custom_agents JSON."})
+                return
+
         merged: dict[str, object] = {}
         errors: dict[str, str] = {}
 
-        workers = max(1, min(settings.max_parallel_workers, len(settings.agent_urls)))
+        has_custom = bool(custom_agent_defs)
+        total = len(settings.agent_urls) + (1 if has_custom else 0)
+        workers = max(1, min(settings.max_parallel_workers, total))
+
         with ThreadPoolExecutor(max_workers=workers) as executor:
             future_map = {
                 executor.submit(
@@ -115,20 +129,54 @@ async def orchestrate(
                 for name, url in settings.agent_urls.items()
             }
 
+            if has_custom:
+                custom_payload = {
+                    "msg": request.msg,
+                    "context": request.context,
+                    "custom_agents": custom_agent_defs,
+                }
+                custom_future = executor.submit(
+                    call_agent_json,
+                    settings.custom_agents_url,
+                    custom_payload,
+                    settings.request_timeout_seconds,
+                )
+                future_map[custom_future] = "__custom_agents__"
+
             for future in as_completed(future_map):
                 name = future_map[future]
                 try:
                     result = future.result()
-                    merged[name] = result
-                    yield _sse({"type": "agent", "agent": name, "result": result})
+                    if name == "__custom_agents__" and isinstance(result, dict):
+                        for agent_name, agent_result in result.items():
+                            merged[agent_name] = agent_result
+                            yield _sse({"type": "agent", "agent": agent_name, "result": agent_result})
+                    else:
+                        merged[name] = result
+                        yield _sse({"type": "agent", "agent": name, "result": result})
                 except Exception as exc:
-                    errors[name] = str(exc)
-                    yield _sse({"type": "agent_error", "agent": name, "detail": str(exc)})
+                    if name == "__custom_agents__":
+                        errors["custom_agents"] = str(exc)
+                        yield _sse({"type": "agent_error", "agent": "custom_agents", "detail": str(exc)})
+                    else:
+                        errors[name] = str(exc)
+                        yield _sse({"type": "agent_error", "agent": name, "detail": str(exc)})
+
+        try:
+            aggregated = call_agent_json(
+                settings.result_aggregator_url,
+                {"agents": merged},
+                settings.request_timeout_seconds,
+            )
+        except AgentCallError as exc:
+            yield _sse({"type": "error", "detail": f"Result aggregator failed: {exc}"})
+            return
 
         response_payload: dict[str, object] = {
             "action": "patch",
             "ambiguity": ambiguity_result,
             "agents": merged,
+            "result": aggregated,
         }
         if errors:
             response_payload["errors"] = errors

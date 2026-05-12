@@ -18,6 +18,8 @@ class Settings:
     max_parallel_workers: int
     filter_content_agent_url: str
     ambiguity_agent_url: str
+    result_aggregator_url: str
+    custom_agents_url: str
     agent_urls: dict[str, str]
 
 
@@ -33,6 +35,14 @@ def get_settings() -> Settings:
         ambiguity_agent_url=os.getenv(
             "AMBIGUITY_AGENT_URL",
             "http://ambiguilty-resolver-0lvl-agent:8086/v1/analyze/stream",
+        ),
+        result_aggregator_url=os.getenv(
+            "RESULT_AGGREGATOR_URL",
+            "http://result-aggregator-agent:8089/v1/aggregate/stream",
+        ),
+        custom_agents_url=os.getenv(
+            "CUSTOM_AGENTS_URL",
+            "http://custom-agents-service:8091/v1/execute/stream",
         ),
         agent_urls={
             "financial_crime": os.getenv(
