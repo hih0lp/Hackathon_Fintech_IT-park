@@ -1,0 +1,36 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useEffect } from 'react'
+import LandingPage from '../pages/LandingPage/LandingPage.jsx'
+import LoginPage from '../pages/LoginPage/LoginPage.jsx'
+import RegisterPage from '../pages/RegisterPage/RegisterPage.jsx'
+import VerificationPage from '../pages/VerificationPage/VerificationPage.jsx'
+import ProjectsPage from '../pages/ProjectsPage/ProjectsPage.jsx'
+import ProjectPage from '../pages/ProjectPage/ProjectPage.jsx'
+import RadarPage from '../pages/RadarPage/RadarPage.jsx'
+import AccountPage from '../pages/AccountPage/AccountPage.jsx'
+import { AuthProvider } from '../context/AuthContext.jsx'
+import initializeGlobalFunctions from '../utils/globalFunctions.js'
+
+export default function App() {
+  useEffect(() => {
+    // Initialize global functions for voice commands
+    initializeGlobalFunctions()
+  }, [])
+
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify" element={<VerificationPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/projects/:projectId" element={<ProjectPage />} />
+          <Route path="/radar" element={<RadarPage />} />
+          <Route path="/account" element={<AccountPage />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  )
+}

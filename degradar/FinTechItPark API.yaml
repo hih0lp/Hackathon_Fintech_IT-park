@@ -1,0 +1,1171 @@
+openapi: 3.0.3
+info:
+  title: FinTechItPark API
+  version: 1.0.0
+  description: Документация API проекта FinTechItPark
+paths:
+  /chats/:
+    get:
+      operationId: chats_list
+      description: Возвращает все чаты, доступные текущему пользователю (чаты проектов,
+        где он является владельцем). Можно фильтровать по `project` и искать по `name`.
+      summary: Список чатов пользователя
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: project
+        schema:
+          type: integer
+        description: ID проекта
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Поиск по названию чата
+      tags:
+      - chats
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedChatList'
+          description: ''
+    post:
+      operationId: chats_create
+      description: Создаёт новый чат в указанном проекте. Требуется ID проекта через
+        поле `project_id`.
+      summary: Создать чат
+      tags:
+      - chats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Chat'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Chat'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Chat'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+          description: ''
+        '400':
+          description: Ошибка валидации
+  /chats/{chat_id}/ask/:
+    post:
+      operationId: chats_ask_create
+      description: Принимает сообщение пользователя (поле `msg`). Контекст (история
+        чата и данные проекта) формируется автоматически. Возвращает `request_id`
+        для последующего опроса статуса.
+      summary: Отправить сообщение нейросети
+      parameters:
+      - in: path
+        name: chat_id
+        schema:
+          type: integer
+        description: ID чата
+        required: true
+      tags:
+      - chats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                msg:
+                  type: string
+                  description: Текст сообщения пользователя
+              required:
+              - msg
+      security:
+      - jwtAuth: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request_id:
+                    type: integer
+                  status:
+                    type: string
+                    enum:
+                    - pending
+          description: Задача поставлена в очередь
+        '400':
+          description: Отсутствует поле msg
+        '403':
+          description: Нет доступа к чату
+        '404':
+          description: Чат не найден
+  /chats/{chat_id}/ask/{request_id}/:
+    get:
+      operationId: chats_ask_retrieve
+      description: Возвращает текущий статус запроса к нейросети. Если завершён —
+        возвращает ответ бота и сгенерированные задачи.
+      summary: Статус обработки сообщения
+      parameters:
+      - in: path
+        name: chat_id
+        schema:
+          type: integer
+        description: ID чата
+        required: true
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        description: ID запроса (получен при отправке)
+        required: true
+      tags:
+      - chats
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                    - pending
+                    - processing
+                    - completed
+                    - failed
+                  request_id:
+                    type: integer
+                  result_text:
+                    type: string
+                    nullable: true
+                  tasks:
+                    type: array
+                    items:
+                      type: object
+                    nullable: true
+                  error:
+                    type: string
+                    nullable: true
+          description: Успешный ответ (статус может быть completed, pending, processing
+            или failed)
+        '403':
+          description: Нет доступа
+        '404':
+          description: Запрос или чат не найден
+  /chats/{chat_id}/messages/:
+    get:
+      operationId: chats_messages_list
+      description: Возвращает все сообщения чата (и от пользователя, и от нейросети).
+      summary: Сообщения чата
+      parameters:
+      - in: path
+        name: chat_id
+        schema:
+          type: integer
+        description: ID чата
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - chats
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMessageList'
+          description: ''
+        '403':
+          description: Нет доступа к чату
+  /chats/{id}/:
+    delete:
+      operationId: chats_destroy
+      description: Удаляет чат и все его сообщения (каскадно). Только владелец проекта.
+      summary: Удалить чат
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chats
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: Чат удалён
+        '403':
+          description: Нет прав
+        '404':
+          description: Чат не найден
+  /projects/:
+    get:
+      operationId: projects_list
+      summary: Список проектов пользователя
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjectList'
+          description: ''
+    post:
+      operationId: projects_create
+      description: Создаёт новый проект. Можно загрузить несколько файлов, передав
+        их в поле `uploaded_files`.
+      summary: Создать проект
+      tags:
+      - projects
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                country:
+                  type: string
+                uploaded_files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Список файлов (можно выбрать несколько)
+              required:
+              - title
+              - description
+              - country
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: ''
+        '400':
+          description: Ошибка валидации
+  /projects/{id}/:
+    get:
+      operationId: projects_retrieve
+      description: Возвращает информацию о конкретном проекте вместе с файлами
+      summary: Детали проекта
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: ''
+        '404':
+          description: Проект не найден
+    put:
+      operationId: projects_update
+      description: Обновляет все поля проекта (только владелец)
+      summary: Полное обновление проекта
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Project'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Project'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: ''
+        '400':
+          description: Ошибка валидации
+        '403':
+          description: Нет прав
+    patch:
+      operationId: projects_partial_update
+      description: Обновляет выбранные поля проекта (только владелец)
+      summary: Частичное обновление проекта
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProject'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProject'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProject'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: ''
+        '400':
+          description: Ошибка валидации
+        '403':
+          description: Нет прав
+    delete:
+      operationId: projects_destroy
+      description: Удаляет проект и все связанные файлы (только владелец)
+      summary: Удалить проект
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: Успешно удалено
+        '403':
+          description: Нет прав
+        '404':
+          description: Не найден
+  /projects/{project_id}/upload/:
+    post:
+      operationId: projects_upload_create
+      description: Принимает список файлов в поле `files` (multipart/form-data, массив)
+      summary: Загрузить несколько файлов в проект
+      parameters:
+      - in: path
+        name: project_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - projects
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectFile'
+          description: ''
+        '400':
+          description: Ошибка валидации
+  /projects/files/{file_id}/:
+    delete:
+      operationId: projects_files_destroy
+      description: Удаляет конкретный файл. Пользователь должен быть владельцем проекта,
+        к которому привязан файл.
+      summary: Удалить файл из проекта
+      parameters:
+      - in: path
+        name: file_id
+        schema:
+          type: integer
+        description: ID файла
+        required: true
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: Файл удалён
+        '403':
+          description: Нет прав
+        '404':
+          description: Файл не найден
+  /tasks/:
+    get:
+      operationId: tasks_list
+      description: Возвращает все задачи пользователя (через чаты). Можно фильтровать
+        по chat_id.
+      summary: Список задач
+      parameters:
+      - in: query
+        name: chat
+        schema:
+          type: integer
+        description: ID чата
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - tasks
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaskList'
+          description: ''
+  /tasks/{id}/:
+    get:
+      operationId: tasks_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - tasks
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+    put:
+      operationId: tasks_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Task'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Task'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+    patch:
+      operationId: tasks_partial_update
+      description: Обновление информации о задаче
+      summary: Обновить задачу
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTask'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTask'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTask'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+    delete:
+      operationId: tasks_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - tasks
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /tasks/create/:
+    post:
+      operationId: tasks_create_create
+      description: Принимает `chat_id` и список `titles`. Для каждого заголовка создаётся
+        задача с `is_closed=False`.
+      summary: Создать несколько задач
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskBulkCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TaskBulkCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TaskBulkCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaskList'
+          description: ''
+        '400':
+          description: Ошибка валидации
+  /users/login/:
+    post:
+      operationId: users_login_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: Успешный вход (токены и данные пользователя)
+        '401':
+          description: Неверный email/пароль или email не подтверждён
+  /users/register/:
+    post:
+      operationId: users_register_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: Код отправлен
+        '400':
+          description: Ошибка валидации
+  /users/resend-code/:
+    post:
+      operationId: users_resend_code_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Email'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Email'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Email'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: Новый код отправлен
+        '400':
+          description: Email уже подтверждён
+        '404':
+          description: Пользователь не найден
+  /users/token/refresh/:
+    post:
+      operationId: users_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /users/verify-code/:
+    post:
+      operationId: users_verify_code_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyCode'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyCode'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyCode'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: Успешная активация и токены
+        '400':
+          description: 'Ошибка: код истёк, неверный код или email уже подтверждён'
+        '404':
+          description: Пользователь не найден
+components:
+  schemas:
+    Chat:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название чата
+          maxLength: 50
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        project_id:
+          type: integer
+          writeOnly: true
+        available:
+          type: boolean
+          title: Открытый чат
+      required:
+      - available
+      - created
+      - id
+      - name
+      - project_id
+    Email:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - email
+      - password
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        sender:
+          $ref: '#/components/schemas/SenderEnum'
+        text:
+          type: string
+          title: Текст сообщения
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - text
+    PaginatedChatList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Chat'
+    PaginatedMessageList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+    PaginatedProjectList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+    PaginatedTaskList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+    PatchedProject:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          title: Название проекта
+          maxLength: 50
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        description:
+          type: string
+          title: Описание проекта
+          maxLength: 255
+        country:
+          type: string
+          title: Страна проекта
+          maxLength: 50
+        user:
+          type: integer
+          readOnly: true
+          title: Владелец проекта
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectFile'
+          readOnly: true
+        chats_count:
+          type: integer
+          readOnly: true
+        uploaded_files:
+          type: array
+          items:
+            type: string
+            format: uri
+          writeOnly: true
+          description: Список файлов для загрузки при создании проекта
+    PatchedTask:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+          title: Название задачи
+        active:
+          type: boolean
+          title: В работе
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+    Project:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          title: Название проекта
+          maxLength: 50
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        description:
+          type: string
+          title: Описание проекта
+          maxLength: 255
+        country:
+          type: string
+          title: Страна проекта
+          maxLength: 50
+        user:
+          type: integer
+          readOnly: true
+          title: Владелец проекта
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectFile'
+          readOnly: true
+        chats_count:
+          type: integer
+          readOnly: true
+        uploaded_files:
+          type: array
+          items:
+            type: string
+            format: uri
+          writeOnly: true
+          description: Список файлов для загрузки при создании проекта
+      required:
+      - chats_count
+      - country
+      - created
+      - description
+      - files
+      - id
+      - title
+      - user
+    ProjectFile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file:
+          type: string
+          format: uri
+        uploaded_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - file
+      - id
+      - uploaded_at
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+        password2:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+      - password2
+    SenderEnum:
+      enum:
+      - user
+      - bot
+      type: string
+      description: |-
+        * `user` - Пользователь
+        * `bot` - Нейросеть
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+          title: Название задачи
+        active:
+          type: boolean
+          title: В работе
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - active
+      - created
+      - id
+      - title
+    TaskBulkCreate:
+      type: object
+      properties:
+        chat_id:
+          type: integer
+          writeOnly: true
+        titles:
+          type: array
+          items:
+            type: string
+            maxLength: 255
+          writeOnly: true
+          description: Список названий задач (минимум 1)
+      required:
+      - chat_id
+      - titles
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    VerifyCode:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        code:
+          type: string
+          maxLength: 6
+      required:
+      - code
+      - email
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
