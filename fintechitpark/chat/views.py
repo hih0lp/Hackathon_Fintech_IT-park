@@ -142,9 +142,9 @@ class AskLLMView(APIView):
             context_text=context_text,
             status='pending'
         )
+        custom_agents = chat.project.agents.all()
 
-        task = call_llm.send(llm_req.id, chat.id, user_msg, context_text)
-        # llm_req.celery_task_id = task.id
+        task = call_llm.send(llm_req.id, chat.id, user_msg, context_text, custom_agents)
         llm_req.save()
 
         return Response({

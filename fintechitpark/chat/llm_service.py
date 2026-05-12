@@ -3,7 +3,6 @@ import os
 import django
 import json
 
-# Импорты для WebSocket - в самом верху!
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
@@ -21,7 +20,7 @@ from .models import LLMRequest, Message, Chat
     min_backoff=60000,
     max_backoff=60000
 )
-def call_llm(llm_request_id: int, chat_id: int, user_message: str, context_text: str):
+def call_llm(llm_request_id: int, chat_id: int, user_message: str, context_text: str, custom_agents: list):
     """Отправляет запрос к LLM-микросервису (SSE поток)"""
     req = None
     try:
@@ -49,6 +48,7 @@ def call_llm(llm_request_id: int, chat_id: int, user_message: str, context_text:
         data = {
             'msg': user_message,
             'context_text': context_text,
+            'add-agents': custom_agents
         }
 
         # 3. POST-запрос к LLM
@@ -98,17 +98,27 @@ def call_llm(llm_request_id: int, chat_id: int, user_message: str, context_text:
         elif result.get('type') == 'done':
             result_data = result.get('result', {})
             agents_data = result_data.get('agents', {})
-            errors = result_data.get('errors', {})
             action = result_data.get('action', 'unknown')
 
-            msg_parts = [f"🏷️ **Действие:** {action}\n"]
+            msg_parts = []
             all_tasks = []
+            if action and action != 'unknown':
+                msg_parts.append(f"🏷️ **Действие:** {action}\n")
 
             for agent_name, agent_result in agents_data.items():
                 spec = agent_result.get('spec', '')
                 if spec and spec != "...":
-                    msg_parts.append(f"\n**{agent_name.replace('_', ' ').title()}**:\n{spec}")
-
+                    msg_parts.append(f"\n**{agent_name.replace('_', ' ').title()}**:\n")
+                    lines = spec.strip().split('\n')
+                    for line in lines:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        if not (line[0].isdigit() or line[0] in '-•*'):
+                            msg_parts.append(f"• {line}\n")
+                        else:
+                            msg_parts.append(f"{line}\n")
+                    msg_parts.append("\n")
                 agent_tasks = agent_result.get('tasks', [])
                 for task in agent_tasks:
                     if task and task != "...":
@@ -116,13 +126,7 @@ def call_llm(llm_request_id: int, chat_id: int, user_message: str, context_text:
                             'title': task,
                             'agent': agent_name
                         })
-
-            if errors:
-                msg_parts.append("\n⚠️ **Ошибки при обработке:**")
-                for agent_name, error in errors.items():
-                    msg_parts.append(f"- {agent_name}: {error}")
-
-            msg = "\n".join(msg_parts) if len(msg_parts) > 1 else "Запрос обработан, но спецификации не сформированы."
+            msg = "".join(msg_parts).strip()
             tasks = all_tasks
 
         elif result.get('type') == 'error':

@@ -45,7 +45,7 @@ def add_board_id(api_key, yougile_project_id, title):
     result = call_yougile_api("POST", "boards", api_key, data)
     board_id = result.get("id")
     if not board_id:
-        raise YouGileAPIError("Не удалось полуичить ID доски")
+        raise YouGileAPIError("Не удалось получить ID доски")
     return board_id
 
 
