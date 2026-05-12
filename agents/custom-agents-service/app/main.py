@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
 
@@ -8,7 +10,19 @@ from .config import get_settings
 from .schemas import ExecuteRequest
 
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] custom-agents: %(message)s",
+)
+logger = logging.getLogger("custom-agents")
+
 settings = get_settings()
+logger.info(
+    "Service starting | model=%s | api_key_set=%s | base_url=%s",
+    settings.anthropic_model,
+    bool(settings.anthropic_api_key),
+    settings.anthropic_base_url,
+)
 
 app = FastAPI(
     title="Custom Agents Service",
