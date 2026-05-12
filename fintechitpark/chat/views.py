@@ -129,14 +129,14 @@ class AskLLMView(APIView):
         if not user_msg:
             return Response({'error': 'msg required'}, status=400)
 
-        # Подготовка контекста
-        messages_history = chat.messages.order_by('created_at').values('sender', 'text')
-        context_text = "История диалога:\n"
-        for m in messages_history:
-            context_text += f"{m['sender']}: {m['text']}\n"
-        context_text += f"\nИнформация о проекте:\n"
-        context_text += f"Название: {chat.project.title}\nОписание: {chat.project.description}\nСтрана: {chat.project.country}"
-
+        full_history = chat.get_full_context()
+        context_text = (
+            f"{full_history}\n\n"
+            f"Информация о проекте:\n"
+            f"Название: {chat.project.title}\n"
+            f"Описание: {chat.project.description}\n"
+            f"Страна: {chat.project.country}"
+        )
         llm_req = LLMRequest.objects.create(
             chat=chat,
             user_message=user_msg,
