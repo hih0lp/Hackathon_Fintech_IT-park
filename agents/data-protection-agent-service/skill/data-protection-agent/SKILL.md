@@ -110,9 +110,9 @@ normalized_score = score / 2.5
 ### Step 6 — Sort & Format
 Sort included vulnerabilities by `normalized_score` descending (highest first).
 
-Format each item concisely:
+Format each item concisely (max 2 sentences):
 ```
-N) [Short title] — [1-2 sentence description of the problem and what to do]. [Regulation reference].
+N) [Short title] — [problem and fix in 1-2 sentences]. [Regulation reference].
 ```
 
 Scores are used only for internal filtering and sorting — never include scores or any internal metadata in the output.
@@ -121,10 +121,11 @@ Scores are used only for internal filtering and sorting — never include scores
 Based on `msg` and `context`, research the feature area and generate short actionable improvement suggestions related to Data Protection & Privacy. These are not vulnerabilities — they are things the team *should do* to improve privacy posture, even if not critical blockers.
 
 Rules:
-- Each task is 1 short sentence, imperative form ("Implement...", "Add...", "Review...")
-- Only tasks relevant to the 6 subdomains
-- 3–7 tasks typically; skip if genuinely nothing applies
+- Each task is 1 short sentence, imperative form ("Implement...", "Add...", "Review..."), ≤ 12 words
+- Only tasks relevant to the 6 subdomains — silently ignore anything outside Data Protection
+- **Maximum 3 tasks**; if nothing applies — `[]`
 - Same language as `msg`
+- Do NOT suggest improvements that belong to other agents (AML, payments, crypto, fraud)
 
 ### Step 8 — Output
 Return:

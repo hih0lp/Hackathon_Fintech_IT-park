@@ -159,11 +159,10 @@ It is valid and expected that in some cases **zero vulnerabilities** pass this t
 
 ## Step 6 — Research & Generate Tasks
 
-After scoring, research the specific feature and context to generate improvement tasks for the `tasks` field.
-
-Tasks are **not** about fixing vulnerabilities — those go in `spec`. Tasks are forward-looking enhancements that raise the overall compliance, fraud-resistance, and operational maturity of the feature.
-
-Research the context and generate 3–7 specific improvement suggestions. No generic advice.
+Generate up to **3 improvement tasks** strictly within the Financial Crime & Integrity domain.
+Tasks are not fixes for `spec` vulnerabilities — they are forward-looking enhancements.
+Each task: 1 sentence, ≤ 12 words, no generic advice.
+Do NOT include tasks from other domains (data privacy, consumer protection, payments, AI governance) — silently ignore them.
 
 ---
 
@@ -187,8 +186,9 @@ Each numbered item is one line: **title — description. Recommendation.**
 If no vulnerabilities exceed 7.5 — domain name only, no numbered items.
 
 ### `tasks` field
-An array of short improvement suggestions, one sentence each.
-Language matches `msg`. No IDs, no scores, no explanations — just the suggestion itself.
+Array of up to **3** short improvement suggestions, one sentence each (≤ 12 words).
+Language matches `msg`. No IDs, no scores, no explanations — just the suggestion.
+Strictly Financial Crime domain only. If nothing applies — `[]`.
 
 ---
 
