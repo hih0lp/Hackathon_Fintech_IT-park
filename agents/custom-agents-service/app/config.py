@@ -64,6 +64,6 @@ def get_settings() -> Settings:
         ),
         anthropic_temperature=_get_env_float(
             "ANTHROPIC_TEMPERATURE",
-            _get_env_float("CUSTOM_AGENTS_TEMPERATURE", 0.1),
+            _get_env_float("CUSTOM_AGENTS_TEMPERATURE", 0.0),
         ),
     )
