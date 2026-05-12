@@ -75,7 +75,7 @@ def get_settings() -> Settings:
         ),
         anthropic_temperature=_get_env_float(
             "ANTHROPIC_TEMPERATURE",
-            _get_env_float("FILTER_CONTENT_TEMPERATURE", 0.0),
+            _get_env_float("FILTER_CONTENT_TEMPERATURE", 0.1),
         ),
         skill_markdown_path=skill_dir / "SKILL.md",
     )
