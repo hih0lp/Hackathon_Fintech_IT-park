@@ -3,10 +3,19 @@ from django.db import models
 
 
 class Chat(models.Model):
-    project = models.ForeignKey('project.Project', on_delete=models.CASCADE, related_name='chats', verbose_name="Проект")
-    name = models.CharField(max_length=50, verbose_name="Название чата")
-    available = models.BooleanField(verbose_name="Открытый чат")
+    project = models.ForeignKey('project.Project', on_delete=models.CASCADE, related_name='chats')
+    name = models.CharField(max_length=50)
+    available = models.BooleanField(default=True, verbose_name="Открытый чат")
     created = models.DateTimeField(auto_now_add=True)
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='versions',
+        verbose_name="Предыдущая версия чата"
+    )
+    version_number = models.PositiveSmallIntegerField(default=1, editable=False)
 
     class Meta:
         ordering = ['-created']
@@ -14,7 +23,36 @@ class Chat(models.Model):
         verbose_name_plural = "Чаты"
 
     def __str__(self):
-        return f"{self.project.title} - {self.name}"
+        return f"{self.project.title} - {self.name} (v{self.version_number})"
+
+    def get_full_context(self):
+        """
+        Возвращает текст истории всех сообщений текущего чата и всех его предков
+        для передачи в LLM.
+        """
+        messages = []
+        current = self
+        # Собираем сообщения всех чатов снизу вверх (от самого старого предка до текущего)
+        lineage = []
+        while current:
+            lineage.append(current)
+            current = current.parent
+        lineage.reverse()  # от самого старого к новому
+
+        for chat in lineage:
+            chat_messages = chat.messages.order_by('created_at').values('sender', 'text')
+            for msg in chat_messages:
+                messages.append(f"{msg['sender']}: {msg['text']}")
+        return "\n".join(messages) if messages else "История диалога пуста."
+
+    def save(self, *args, **kwargs):
+        # Автоматически вычисляем номер версии
+        if not self.pk and self.parent:
+            # Создаётся новая версия – номер = номер родителя + 1
+            self.version_number = self.parent.version_number + 1
+        elif not self.pk:
+            self.version_number = 1
+        super().save(*args, **kwargs)
 
 
 class Message(models.Model):
