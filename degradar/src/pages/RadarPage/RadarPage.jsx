@@ -9,6 +9,9 @@ import { projects, chats, auth } from '../../api/client'
 import { createWebSocketClient } from '../../api/websocket.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 
+// Get API base URL from client
+const API_BASE_URL = 'https://back.psbsmartedu.ru'
+
 const projectColors = ['#224d47', '#7c3aed', '#059669', '#dc2626', '#0284c7', '#ea580c', '#db2777', '#65a30d']
 
 const getProjectColor = (id) => projectColors[(id - 1) % projectColors.length]
@@ -27,6 +30,7 @@ export default function RadarPage() {
   const [connectionStatus, setConnectionStatus] = useState('loading')
   const [error, setError] = useState(null)
   const [isChatBlocked, setIsChatBlocked] = useState(false)
+  const [isSendingToYouGile, setIsSendingToYouGile] = useState(false)
   
   const projectId = searchParams.get('project')
   const featureId = searchParams.get('feature')
@@ -368,15 +372,46 @@ export default function RadarPage() {
   }
 
   // Add task to panel
-  const handleAddTask = (task) => {
+  const handleAddTask = async (task) => {
     console.log('Adding task:', task)
-    setTasks(prev => [...prev, {
-      id: Date.now(),
-      title: task.title,
-      agent: task.agent || 'general',
-      status: 'pending',
-      createdAt: new Date().toISOString()
-    }])
+    
+    // Create task via API first
+    try {
+      const response = await fetch(`${API_BASE_URL}/tasks/create/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth.getToken()}`
+        },
+        body: JSON.stringify({
+          chat_id: selectedChat?.id,
+          titles: [task.title]
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to create task: ${response.status}`)
+      }
+
+      const result = await response.json()
+      console.log('Task created:', result)
+
+      // Add server-side task to state - response is an array directly
+      if (result && result.length > 0) {
+        const createdTask = result[0]
+        setTasks(prev => [...prev, {
+          id: createdTask.id,
+          title: createdTask.title,
+          agent: task.agent || 'general',
+          status: 'pending',
+          createdAt: createdTask.created || new Date().toISOString()
+        }])
+      }
+    } catch (error) {
+      console.error('Error creating task:', error)
+      setError('Не удалось создать задачу')
+      setTimeout(() => setError(null), 3000)
+    }
   }
 
   // Toggle task status
@@ -391,6 +426,65 @@ export default function RadarPage() {
   // Delete task
   const handleDeleteTask = (taskId) => {
     setTasks(prev => prev.filter(task => task.id !== taskId))
+  }
+
+  // Clear completed tasks
+  const handleClearCompleted = () => {
+    setTasks(prev => prev.filter(task => task.status !== 'completed'))
+  }
+
+  // Send tasks to YouGile
+  const handleSendToYouGile = async () => {
+    const pendingTasks = tasks.filter(task => task.status === 'pending')
+    
+    if (pendingTasks.length === 0) {
+      setError('Нет активных задач для отправки')
+      return
+    }
+
+    setIsSendingToYouGile(true)
+    setError(null)
+
+    try {
+      // Get task IDs from existing tasks
+      const taskIds = pendingTasks.map(task => task.id)
+      
+      // Send task IDs directly to /tasks/duplicate-to-yougile/
+      const response = await fetch(`${API_BASE_URL}/tasks/duplicate-to-yougile/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth.getToken()}`
+        },
+        body: JSON.stringify({
+          task_ids: taskIds
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`Ошибка отправки в YouGile: ${response.status}`)
+      }
+
+      const result = await response.json()
+      console.log('Tasks sent to YouGile:', result)
+      
+      // Mark sent tasks as completed
+      setTasks(prev => prev.map(task => 
+        taskIds.includes(task.id) 
+          ? { ...task, status: 'completed' }
+          : task
+      ))
+
+      // Show success message
+      setError(`Отправлено ${pendingTasks.length} задач в YouGile`)
+      setTimeout(() => setError(null), 3000)
+
+    } catch (error) {
+      console.error('Error sending tasks to YouGile:', error)
+      setError('Не удалось отправить задачи в YouGile')
+    } finally {
+      setIsSendingToYouGile(false)
+    }
   }
 
   // Handle chat deletion
@@ -483,6 +577,9 @@ export default function RadarPage() {
             tasks={tasks}
             onToggleTask={handleToggleTask}
             onDeleteTask={handleDeleteTask}
+            onClearCompleted={handleClearCompleted}
+            onSendToYouGile={handleSendToYouGile}
+            isSendingToYouGile={isSendingToYouGile}
           />
         </aside>
       </div>

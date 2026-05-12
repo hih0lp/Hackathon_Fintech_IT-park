@@ -12,12 +12,6 @@ export default function AgileModal({ isOpen, onClose, onSubmit }) {
   const modalRef = useRef(null)
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        onClose()
-      }
-    }
-
     const handleEscape = (event) => {
       if (event.key === 'Escape') {
         onClose()
@@ -25,7 +19,6 @@ export default function AgileModal({ isOpen, onClose, onSubmit }) {
     }
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
       document.addEventListener('keydown', handleEscape)
       // Reset form when modal opens
       setFormData({ username: '', companyId: '', password: '' })
@@ -33,7 +26,6 @@ export default function AgileModal({ isOpen, onClose, onSubmit }) {
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
       document.removeEventListener('keydown', handleEscape)
     }
   }, [isOpen, onClose])
@@ -144,6 +136,9 @@ export default function AgileModal({ isOpen, onClose, onSubmit }) {
               disabled={isSubmitting}
             />
             {errors.companyId && <span className={styles.errorMessage}>{errors.companyId}</span>}
+            <div className={styles.fieldHint}>
+              ID компании. Для получения ID компании можно использовать горячие клавиши в интерфейсе (Ctrl+Alt+Q / Ctrl+Option+Q для Mac)
+            </div>
           </div>
 
           <div className={styles.formGroup}>

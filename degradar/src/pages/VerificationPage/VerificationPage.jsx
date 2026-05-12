@@ -63,7 +63,7 @@ export default function VerificationPage() {
       if (response.access && response.refresh) {
         auth.setTokens(response.access, response.refresh)
         localStorage.removeItem('pendingEmail')
-        navigate('/projects')
+        navigate('/login')
       } else {
         setError('Неверный ответ от сервера')
       }
