@@ -56,6 +56,12 @@ async def orchestrate(
     request = AgentRequest(msg=msg, context="\n\n".join(parts))
     payload = {"msg": request.msg, "context": request.context}
 
+    logger.info(
+        "Request received | msg_len=%d | add_agents_raw=%s",
+        len(msg),
+        add_agents[:120] if add_agents else "None",
+    )
+
     def event_stream() -> Iterator[str]:
         logger.info("Stage 1/4 — content filter")
         try:
@@ -171,12 +177,17 @@ async def orchestrate(
                 try:
                     result = future.result()
                     if name == "__custom_agents__" and isinstance(result, dict):
-                        for agent_name, agent_result in result.items():
-                            merged[agent_name] = agent_result
-                            custom_agents_merged[agent_name] = agent_result
-                            logger.info("Agent done [custom]: %s", agent_name)
-                            yield _sse({"type": "agent", "agent": agent_name, "result": agent_result})
-                    else:
+                        if not result:
+                            logger.warning("Custom-agents service returned empty result — all custom agents likely failed internally")
+                            errors["custom_agents"] = "Custom-agents service returned empty result"
+                            yield _sse({"type": "agent_error", "agent": "custom_agents", "detail": "Custom-agents service returned empty result"})
+                        else:
+                            for agent_name, agent_result in result.items():
+                                merged[agent_name] = agent_result
+                                custom_agents_merged[agent_name] = agent_result
+                                logger.info("Agent done [custom]: %s", agent_name)
+                                yield _sse({"type": "agent", "agent": agent_name, "result": agent_result})
+                    elif name != "__custom_agents__":
                         merged[name] = result
                         logger.info("Agent done [built-in]: %s", name)
                         yield _sse({"type": "agent", "agent": name, "result": result})
