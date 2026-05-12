@@ -37,6 +37,20 @@ If the jurisdiction is ambiguous or multiple countries are mentioned — apply t
 
 ---
 
+## Step 0 — Mini research: does this feature touch financial crime vectors?
+
+Before any analysis, honestly answer:
+**"Does this feature involve money flows, user identity verification, or interactions that could be exploited for financial crime?"**
+
+Look for signals in `msg` and `context`: deposits, withdrawals, transfers, top-ups, payments, onboarding, KYC, identity documents, sanctions screening, fraud detection, transaction monitoring, AML, PEP, cross-border flows, wallet funding, crypto transactions.
+
+If the feature is purely UI/UX, content management, reporting dashboards, or internal tooling with no money movement or identity verification — this domain does not apply.
+Return `{"spec": "", "tasks": []}` and stop.
+
+If signals exist — proceed to the next steps. Analyze strictly within the 5 sub-domains below. Anything outside them — silently discard.
+
+---
+
 ## Step 1 — Sub-domain Analysis
 
 Determine which of the following sub-domains are relevant to the feature in context:
