@@ -2,14 +2,15 @@ from __future__ import annotations
 
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Iterator
+from typing import Annotated, Iterator
 
-from fastapi import FastAPI
+from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from .agent_client import AgentCallError, call_agent_json
 from .config import get_settings
-from .schemas import AnalyzeRequest
+from .file_parser import parse_upload
+from .schemas import AgentRequest
 
 
 settings = get_settings()
@@ -27,20 +28,25 @@ def _sse(data: dict[str, object]) -> str:
 
 @app.get("/health")
 def health() -> JSONResponse:
-    return JSONResponse(
-        {
-            "status": "ok",
-            "service": "agents-orchestrator",
-        }
-    )
+    return JSONResponse({"status": "ok", "service": "agents-orchestrator"})
 
 
 @app.post("/v1/orchestrate")
-def orchestrate(request: AnalyzeRequest) -> StreamingResponse:
-    payload = {
-        "msg": request.msg,
-        "context": request.context,
-    }
+async def orchestrate(
+    msg: Annotated[str, Form(min_length=1)],
+    context_text: Annotated[str | None, Form()] = None,
+    context_files: Annotated[list[UploadFile] | None, File()] = None,
+) -> StreamingResponse:
+    parts: list[str] = []
+    if context_text:
+        parts.append(context_text)
+    for f in (context_files or []):
+        if f.filename:
+            parsed = await parse_upload(f)
+            parts.append(f"[File: {parsed.filename}]\n{parsed.text}")
+
+    request = AgentRequest(msg=msg, context="\n\n".join(parts))
+    payload = {"msg": request.msg, "context": request.context}
 
     def event_stream() -> Iterator[str]:
         try:
@@ -78,9 +84,7 @@ def orchestrate(request: AnalyzeRequest) -> StreamingResponse:
             return
 
         if not isinstance(ambiguity_result, dict):
-            yield _sse(
-                {"type": "error", "detail": "Ambiguity resolver returned non-object JSON."}
-            )
+            yield _sse({"type": "error", "detail": "Ambiguity resolver returned non-object JSON."})
             return
 
         action = str(ambiguity_result.get("action", "")).strip().lower()
@@ -117,15 +121,9 @@ def orchestrate(request: AnalyzeRequest) -> StreamingResponse:
                     result = future.result()
                     merged[name] = result
                     yield _sse({"type": "agent", "agent": name, "result": result})
-                except Exception as exc:  # pragma: no cover - defensive path
+                except Exception as exc:
                     errors[name] = str(exc)
-                    yield _sse(
-                        {
-                            "type": "agent_error",
-                            "agent": name,
-                            "detail": str(exc),
-                        }
-                    )
+                    yield _sse({"type": "agent_error", "agent": name, "detail": str(exc)})
 
         response_payload: dict[str, object] = {
             "action": "patch",
@@ -140,8 +138,5 @@ def orchestrate(request: AnalyzeRequest) -> StreamingResponse:
     return StreamingResponse(
         event_stream(),
         media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "X-Accel-Buffering": "no",
-        },
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
