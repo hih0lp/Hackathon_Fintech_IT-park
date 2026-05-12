@@ -1,10 +1,22 @@
 from __future__ import annotations
 
-from typing import Any
+from dataclasses import dataclass
 
-from pydantic import BaseModel, Field
+ALLOWED_EXTENSIONS: frozenset[str] = frozenset({
+    ".pdf",
+    ".doc", ".docx",
+    ".xls", ".xlsx",
+})
 
 
-class AnalyzeRequest(BaseModel):
-    msg: str = Field(..., min_length=1, description="User question or request")
-    context: Any = Field(..., description="Project context for analysis")
+@dataclass
+class ParsedFile:
+    filename: str
+    text: str
+
+
+@dataclass
+class AgentRequest:
+    """Normalized request that always flows into agents."""
+    msg: str
+    context: str
