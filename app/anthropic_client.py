@@ -1,26 +1,41 @@
 from __future__ import annotations
 
 import json
+import re
 from typing import AsyncIterator
 
 import anthropic
 
 from .config import Settings
-from .schemas import AnalyzeRequest
+from .schemas import AgentRequest
 
 
-def build_user_payload(request: AnalyzeRequest) -> str:
+_CODE_BLOCK = re.compile(r"^```[a-zA-Z]*\s*(.*?)\s*```$", re.DOTALL)
+
+
+def _extract_json(text: str) -> str:
+    """Strip markdown code fences and return clean JSON string."""
+    stripped = text.strip()
+    m = _CODE_BLOCK.match(stripped)
+    if m:
+        stripped = m.group(1).strip()
+    return stripped
+
+
+def _validate_json(text: str) -> dict:
+    """Parse and return JSON; raise ValueError if invalid."""
+    return json.loads(text)
+
+
+def build_content(request: AgentRequest) -> str:
     return json.dumps(
-        {
-            "msg": request.msg,
-            "context": request.context,
-        },
+        {"msg": request.msg, "context": request.context},
         ensure_ascii=False,
     )
 
 
 async def stream_anthropic_events(
-    request: AnalyzeRequest,
+    request: AgentRequest,
     settings: Settings,
     system_prompt: str,
 ) -> AsyncIterator[str]:
@@ -29,7 +44,7 @@ async def stream_anthropic_events(
         base_url=settings.anthropic_base_url,
     )
 
-    payload = build_user_payload(request)
+    payload = build_content(request)
     full_text = ""
 
     try:
@@ -53,22 +68,33 @@ async def stream_anthropic_events(
                 yield (
                     "data: "
                     + json.dumps(
-                        {
-                            "type": "error",
-                            "detail": "Response truncated: max_tokens limit reached.",
-                        },
+                        {"type": "error", "detail": "Response truncated: max_tokens limit reached."},
                         ensure_ascii=False,
                     )
                     + "\n\n"
                 )
                 return
 
+        try:
+            clean = _extract_json(full_text)
+            parsed = _validate_json(clean)
+        except (ValueError, json.JSONDecodeError) as exc:
+            yield (
+                "data: "
+                + json.dumps(
+                    {"type": "error", "detail": f"Invalid JSON from model: {exc}", "raw": full_text},
+                    ensure_ascii=False,
+                )
+                + "\n\n"
+            )
+            return
+
         yield (
             "data: "
-            + json.dumps({"type": "done", "result": full_text}, ensure_ascii=False)
+            + json.dumps({"type": "done", "result": parsed}, ensure_ascii=False)
             + "\n\n"
         )
-    except Exception as exc:  # pragma: no cover - provider-specific errors
+    except Exception as exc:  # pragma: no cover
         yield (
             "data: "
             + json.dumps({"type": "error", "detail": str(exc)}, ensure_ascii=False)
