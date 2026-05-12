@@ -4,6 +4,171 @@ info:
   version: 1.0.0
   description: Документация API проекта FinTechItPark
 paths:
+  /agents/:
+    get:
+      operationId: agents_list
+      summary: Список агентов
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: project
+        schema:
+          type: integer
+        description: ID проекта (фильтр)
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - agents
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCustomAgentList'
+          description: ''
+    post:
+      operationId: agents_create
+      summary: Создать агента
+      tags:
+      - agents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomAgent'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomAgent'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomAgent'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomAgent'
+          description: ''
+  /agents/{id}/:
+    get:
+      operationId: agents_retrieve
+      summary: Получить агента
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - agents
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomAgent'
+          description: ''
+    put:
+      operationId: agents_update
+      summary: Обновить агента
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - agents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomAgent'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomAgent'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomAgent'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomAgent'
+          description: ''
+    patch:
+      operationId: agents_partial_update
+      summary: Частично обновить агента
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - agents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomAgent'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomAgent'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomAgent'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomAgent'
+          description: ''
+    delete:
+      operationId: agents_destroy
+      summary: Удалить агента
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - agents
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: Успешно удалено
   /chats/:
     get:
       operationId: chats_list
@@ -226,6 +391,32 @@ paths:
           description: Нет прав
         '404':
           description: Чат не найден
+  /chats/chats/{chat_id}/new-version/:
+    post:
+      operationId: chats_chats_new_version_create
+      description: Создаёт новый чат, который наследует контекст (историю) текущего
+        чата. Новая версия будет открыта для общения.
+      summary: Создать новую версию чата
+      parameters:
+      - in: path
+        name: chat_id
+        schema:
+          type: integer
+        description: ID исходного чата
+        required: true
+      tags:
+      - chats
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+          description: ''
+        '400':
+          description: Превышен лимит версий или ошибка
   /projects/:
     get:
       operationId: projects_list
@@ -256,8 +447,8 @@ paths:
           description: ''
     post:
       operationId: projects_create
-      description: Создаёт новый проект. Можно загрузить несколько файлов, передав
-        их в поле `uploaded_files`.
+      description: 'Создаёт новый проект. Если `sync_with_yougile: true` и у пользователя
+        есть API-ключ YouGile – создаётся зеркальный проект в YouGile.'
       summary: Создать проект
       tags:
       - projects
@@ -273,12 +464,14 @@ paths:
                   type: string
                 country:
                   type: string
+                sync_with_yougile:
+                  type: boolean
+                  default: false
                 uploaded_files:
                   type: array
                   items:
                     type: string
                     format: binary
-                  description: Список файлов (можно выбрать несколько)
               required:
               - title
               - description
@@ -293,7 +486,13 @@ paths:
                 $ref: '#/components/schemas/Project'
           description: ''
         '400':
-          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
   /projects/{id}/:
     get:
       operationId: projects_retrieve
@@ -662,6 +861,41 @@ paths:
           description: ''
         '400':
           description: Ошибка валидации
+  /tasks/duplicate-to-yougile/:
+    post:
+      operationId: tasks_duplicate_to_yougile_create
+      description: Для переданных ID локальных задач создаются копии в YouGile в колонке,
+        привязанной к проекту.
+      summary: Продублировать задачи в YouGile
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DuplicateToYouGile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DuplicateToYouGile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DuplicateToYouGile'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+          description: ''
+        '400':
+          description: Ошибка валидации или синхронизации
+        '403':
+          description: Нет доступа к задачам
   /users/login/:
     post:
       operationId: users_login_create
@@ -796,6 +1030,37 @@ paths:
           description: 'Ошибка: код истёк, неверный код или email уже подтверждён'
         '404':
           description: Пользователь не найден
+  /users/yougile/auth/:
+    post:
+      operationId: users_yougile_auth_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/YouGileAuth'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/YouGileAuth'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/YouGileAuth'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: API-ключ YouGile успешно сохранён.
+        '400':
+          description: Не удалось получить API-ключ. Проверьте ответ YouGile.
 components:
   schemas:
     Chat:
@@ -806,7 +1071,6 @@ components:
           readOnly: true
         name:
           type: string
-          title: Название чата
           maxLength: 50
         created:
           type: string
@@ -819,11 +1083,54 @@ components:
           type: boolean
           title: Открытый чат
       required:
-      - available
       - created
       - id
       - name
       - project_id
+    CustomAgent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+          title: Проект
+        project_title:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          title: Название агента
+          maxLength: 50
+        description:
+          type: string
+          title: Описание агента
+        skill:
+          type: string
+          title: Системный промпт
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created
+      - description
+      - id
+      - name
+      - project
+      - project_title
+      - skill
+    DuplicateToYouGile:
+      type: object
+      properties:
+        task_ids:
+          type: array
+          items:
+            type: integer
+          description: Список ID локальных задач для дублирования в YouGile
+      required:
+      - task_ids
     Email:
       type: object
       properties:
@@ -885,6 +1192,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Chat'
+    PaginatedCustomAgentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomAgent'
     PaginatedMessageList:
       type: object
       required:
@@ -954,6 +1284,32 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Task'
+    PatchedCustomAgent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project:
+          type: integer
+          title: Проект
+        project_title:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          title: Название агента
+          maxLength: 50
+        description:
+          type: string
+          title: Описание агента
+        skill:
+          type: string
+          title: Системный промпт
+        created:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedProject:
       type: object
       properties:
@@ -971,11 +1327,9 @@ components:
         description:
           type: string
           title: Описание проекта
-          maxLength: 255
         country:
           type: string
           title: Страна проекта
-          maxLength: 50
         user:
           type: integer
           readOnly: true
@@ -995,6 +1349,12 @@ components:
             format: uri
           writeOnly: true
           description: Список файлов для загрузки при создании проекта
+        sync_with_yougile:
+          type: boolean
+          writeOnly: true
+          default: false
+          description: Создать зеркальный проект в YouGile (требуется настроенный
+            API-ключ)
     PatchedTask:
       type: object
       properties:
@@ -1029,11 +1389,9 @@ components:
         description:
           type: string
           title: Описание проекта
-          maxLength: 255
         country:
           type: string
           title: Страна проекта
-          maxLength: 50
         user:
           type: integer
           readOnly: true
@@ -1053,6 +1411,12 @@ components:
             format: uri
           writeOnly: true
           description: Список файлов для загрузки при создании проекта
+        sync_with_yougile:
+          type: boolean
+          writeOnly: true
+          default: false
+          description: Создать зеркальный проект в YouGile (требуется настроенный
+            API-ключ)
       required:
       - chats_count
       - country
@@ -1164,6 +1528,19 @@ components:
       required:
       - code
       - email
+    YouGileAuth:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+        companyId:
+          type: string
+      required:
+      - companyId
+      - login
+      - password
   securitySchemes:
     jwtAuth:
       type: http

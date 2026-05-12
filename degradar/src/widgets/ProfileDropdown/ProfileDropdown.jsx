@@ -2,13 +2,13 @@ import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { yougile } from '../../api/client'
-import AgileModal from '../AgileModal/AgileModal.jsx'
+import YougileModal from '../AgileModal/AgileModal.jsx'
 import styles from './ProfileDropdown.module.css'
 
 export default function ProfileDropdown() {
   const { logout, user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
-  const [showAgileModal, setShowAgileModal] = useState(false)
+  const [showYougileModal, setShowYougileModal] = useState(false)
   const [isYougileAuthenticated, setIsYougileAuthenticated] = useState(yougile.isAuthenticated())
   const dropdownRef = useRef(null)
 
@@ -37,22 +37,22 @@ export default function ProfileDropdown() {
     window.location.href = '/'
   }
 
-  const handleBindAgile = () => {
-    setShowAgileModal(true)
+  const handleBindYougile = () => {
+    setShowYougileModal(true)
     setIsOpen(false)
   }
 
-  const handleAgileSubmit = async (formData) => {
-    console.log('handleAgileSubmit called with:', formData)
+  const handleYougileSubmit = async (formData) => {
+    console.log('handleYougileSubmit called with:', formData)
     try {
       console.log('Calling yougile.authenticate...')
       await yougile.authenticate(formData.username, formData.password, formData.companyId)
       console.log('Authentication successful, setting authenticated flag...')
       yougile.setAuthenticated(true)
       setIsYougileAuthenticated(true)
-      console.log('Successfully bound Agile:', formData)
+      console.log('Successfully bound Yougile:', formData)
     } catch (error) {
-      console.error('Failed to bind Agile:', error)
+      console.error('Failed to bind Yougile:', error)
       throw error
     }
   }
@@ -101,7 +101,7 @@ export default function ProfileDropdown() {
               Выйти из Yougile
             </button>
           ) : (
-            <button className={styles.dropdownItem} onClick={handleBindAgile}>
+            <button className={styles.dropdownItem} onClick={handleBindYougile}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                 <circle cx="8.5" cy="7" r="4"/>
@@ -122,10 +122,10 @@ export default function ProfileDropdown() {
         </div>
       )}
       
-      <AgileModal
-        isOpen={showAgileModal}
-        onClose={() => setShowAgileModal(false)}
-        onSubmit={handleAgileSubmit}
+      <YougileModal
+        isOpen={showYougileModal}
+        onClose={() => setShowYougileModal(false)}
+        onSubmit={handleYougileSubmit}
       />
     </div>
   )

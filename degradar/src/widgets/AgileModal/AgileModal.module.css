@@ -34,10 +34,10 @@
 }
 
 .modalTitle {
-  margin: 0;
-  font-size: 18px;
+  font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-primary);
+  margin: 0;
 }
 
 .modalClose {

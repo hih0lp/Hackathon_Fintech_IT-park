@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { projects, chats } from '../../api/client'
 import { useAuth } from '../../context/AuthContext.jsx'
 import ProfileDropdown from '../../widgets/ProfileDropdown/ProfileDropdown.jsx'
+import AgentModal from '../../widgets/AgentModal/AgentModal.jsx'
 import styles from './ProjectPage.module.css'
 
 export default function ProjectPage() {
@@ -15,6 +16,7 @@ export default function ProjectPage() {
   const [error, setError] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [newFeatureName, setNewFeatureName] = useState('')
+  const [showAgentModal, setShowAgentModal] = useState(false)
 
   // Load project and its chats (features)
   useEffect(() => {
@@ -60,6 +62,13 @@ export default function ProjectPage() {
     }
   }
 
+  const handleAgentSelect = (agent) => {
+    console.log('Selected agent:', agent)
+    // Here you can implement what happens when an agent is selected
+    // For example, you could open a chat with this agent or navigate to a specific page
+    setShowAgentModal(false)
+  }
+
   const formatDate = (dateString) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -98,12 +107,23 @@ export default function ProjectPage() {
               <h1 className={styles.title}>Фичи проекта</h1>
               <p className={styles.subtitle}>{features.length} {features.length === 1 ? 'фича' : features.length < 5 ? 'фичи' : 'фич'}</p>
             </div>
-            <button className={styles.createButton} onClick={() => setShowCreateModal(true)}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M12 5v14M5 12h14" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span>Новая фича</span>
-            </button>
+            <div className={styles.buttonGroup}>
+              <button className={styles.agentButton} onClick={() => setShowAgentModal(true)}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <span>Агенты</span>
+              </button>
+              <button className={styles.createButton} onClick={() => setShowCreateModal(true)}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M12 5v14M5 12h14" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span>Новая фича</span>
+              </button>
+            </div>
           </div>
 
           {isLoading ? (
@@ -186,6 +206,14 @@ export default function ProjectPage() {
           </div>
         </div>
       )}
+
+      {/* Agent Modal */}
+      <AgentModal
+        isOpen={showAgentModal}
+        onClose={() => setShowAgentModal(false)}
+        projectId={parseInt(projectId)}
+        onAgentSelect={handleAgentSelect}
+      />
     </div>
   )
 }

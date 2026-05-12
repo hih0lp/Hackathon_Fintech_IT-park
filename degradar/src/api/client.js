@@ -269,6 +269,36 @@ export const tasks = {
   delete: (id) => apiRequest(`/tasks/${id}/`, { method: 'DELETE' }),
 }
 
+// Agents API
+export const agents = {
+  list: (params = {}) => {
+    const query = new URLSearchParams(params).toString()
+    return apiRequest(`/agents/${query ? '?' + query : ''}`)
+  },
+
+  get: (id) => apiRequest(`/agents/${id}/`),
+
+  create: (data) =>
+    apiRequest('/agents/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  update: (id, data) =>
+    apiRequest(`/agents/${id}/`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  partialUpdate: (id, data) =>
+    apiRequest(`/agents/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id) => apiRequest(`/agents/${id}/`, { method: 'DELETE' }),
+}
+
 // Yougile API
 export const yougile = {
   authenticate: (login, password, companyId) =>
@@ -292,4 +322,4 @@ export const yougile = {
   }
 }
 
-export default { auth, projects, chats, tasks, yougile }
+export default { auth, projects, chats, tasks, agents, yougile }
