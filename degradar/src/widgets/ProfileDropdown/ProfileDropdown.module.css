@@ -19,7 +19,7 @@
 }
 
 .profileButton:hover {
-  border-color: var(--accent-blue);
+  border-color: #224d47;
   color: var(--text-primary);
 }
 

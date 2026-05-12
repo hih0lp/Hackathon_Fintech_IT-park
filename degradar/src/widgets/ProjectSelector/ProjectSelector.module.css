@@ -1,0 +1,229 @@
+.projectSelector {
+  position: relative;
+}
+
+.selectorButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-size: 14px;
+  color: #333;
+}
+
+.selectorButton:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.projectBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.projectLabel {
+  font-size: 11px;
+  color: #666;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.projectName {
+  font-weight: 500;
+  color: #1a1a1a;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+  color: #666;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 320px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.dropdownHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdownTitle {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1a1a1a;
+}
+
+.manageButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.manageButton:hover {
+  background: #f8f9fa;
+  border-color: #d0d0d0;
+}
+
+.projectsList {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.loading {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.emptyState {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+}
+
+.emptyState span {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.createButton {
+  padding: 8px 16px;
+  background: #224d47;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.createButton:hover {
+  background: #4b5ed5;
+}
+
+.projectOption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.projectOption:hover {
+  background: #f8f9fa;
+}
+
+.projectOption.selected {
+  background: #f0f4ff;
+}
+
+.optionBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid;
+  font-weight: 600;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.optionContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.optionName {
+  font-weight: 500;
+  font-size: 14px;
+  color: #1a1a1a;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionDescription {
+  font-size: 12px;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.projectOption.selected .optionName {
+  color: #224d47;
+}
+
+.projectOption svg {
+  color: #224d47;
+  flex-shrink: 0;
+}
+
+/* Scrollbar styling */
+.projectsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.projectsList::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.projectsList::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.projectsList::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

@@ -1,10 +1,10 @@
-// Mock data for the REGRADAR application
+// Mock data for the FinScope application
 
 export const mockProject = {
   id: 'pc',
   name: 'Fintech Core',
   initials: 'PC',
-  color: '#5b6ef5',
+  color: '#224d47',
 }
 
 export const mockRadarItems = [

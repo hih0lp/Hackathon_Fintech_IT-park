@@ -10,6 +10,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     // Check if user has valid token on mount
     const token = auth.getToken()
+    console.log('AuthContext - token check:', !!token, 'length:', token ? token.length : 0)
     setIsAuthenticated(!!token)
     
     // Try to get user data from localStorage

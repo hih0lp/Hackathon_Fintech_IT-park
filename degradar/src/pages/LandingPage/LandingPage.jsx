@@ -80,7 +80,7 @@ export default function LandingPage() {
       <header className={styles.nav}>
         <div className={styles.logo}>
           <div className={styles.mark}><span className={styles.markDot} /></div>
-          <span>REGRADAR</span>
+          <span>FinScope</span>
         </div>
         <nav className={styles.navLinks}>
           <a href="#features">Возможности</a>
@@ -133,7 +133,7 @@ export default function LandingPage() {
           </h1>
 
           <p className={styles.lead}>
-            REGRADAR анализирует новые продуктовые фичи на регуляторные риски —
+            FinScope анализирует новые продуктовые фичи на регуляторные риски —
             GDPR, AML, PSD2, AI Act — прямо из описания задачи. Без юристов на ревью,
             без шаблонов, без бесконечных согласований.
           </p>
@@ -190,7 +190,7 @@ export default function LandingPage() {
       <section className={`${styles.features} ${styles.animateSlideDownFadeInDelay1}`} id="features">
         <div className={styles.sectionHead}>
           <div>
-            <span className={styles.kicker}>Почему REGRADAR</span>
+            <span className={styles.kicker}>Почему FinScope</span>
             <h2 className={styles.sectionTitle}>
               Создан для команд, которые <em>запускаются быстро</em>.
             </h2>
@@ -277,7 +277,7 @@ export default function LandingPage() {
       <footer className={styles.footer}>
         <div className={styles.logo}>
           <div className={styles.mark}><span className={styles.markDot} /></div>
-          <span>REGRADAR</span>
+          <span>FinScope</span>
         </div>
         <div className={styles.footerLinks}>
           <a href="#">Privacy</a>
@@ -285,7 +285,7 @@ export default function LandingPage() {
           <a href="#">Status</a>
           <a href="#">Контакты</a>
         </div>
-        <span>© 2026 REGRADAR · Платформа правовой аналитики</span>
+        <span>© 2026 FinScope · Платформа правовой аналитики</span>
       </footer>
 
     </div>

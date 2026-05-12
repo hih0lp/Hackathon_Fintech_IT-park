@@ -66,7 +66,7 @@ export default function RegisterPage() {
               <circle cx="12" cy="12" r="5" stroke="#224d47" strokeWidth="1.5" strokeDasharray="2 2"/>
               <circle cx="12" cy="12" r="1.5" fill="#224d47"/>
             </svg>
-            <span>REGRADAR</span>
+            <span>FinScope</span>
           </Link>
           {isAuthenticated && (
             <Link to="/projects" className={styles.projectsLink}>Проекты</Link>

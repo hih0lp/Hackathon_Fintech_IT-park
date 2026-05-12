@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
+import AgileModal from '../AgileModal/AgileModal.jsx'
 import styles from './ProfileDropdown.module.css'
 
 export default function ProfileDropdown() {
   const { logout, user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
+  const [showAgileModal, setShowAgileModal] = useState(false)
   const dropdownRef = useRef(null)
 
   useEffect(() => {
@@ -29,9 +31,17 @@ export default function ProfileDropdown() {
   }
 
   const handleBindAgile = () => {
-    // TODO: Implement Agile binding logic
-    console.log('Привязать Agile')
+    setShowAgileModal(true)
     setIsOpen(false)
+  }
+
+  const handleAgileSubmit = async (formData) => {
+    // TODO: Implement actual Agile binding API call
+    console.log('Agile binding data:', formData)
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Here you would make an API call to bind Agile
+    // Example: await api.bindAgile(formData)
   }
 
   return (
@@ -81,6 +91,12 @@ export default function ProfileDropdown() {
           </button>
         </div>
       )}
+      
+      <AgileModal
+        isOpen={showAgileModal}
+        onClose={() => setShowAgileModal(false)}
+        onSubmit={handleAgileSubmit}
+      />
     </div>
   )
 }

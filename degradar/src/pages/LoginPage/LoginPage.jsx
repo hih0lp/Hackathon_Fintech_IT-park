@@ -63,7 +63,7 @@ export default function LoginPage() {
               <circle cx="12" cy="12" r="5" stroke="#224d47" strokeWidth="1.5" strokeDasharray="2 2"/>
               <circle cx="12" cy="12" r="1.5" fill="#224d47"/>
             </svg>
-            <span>REGRADAR</span>
+            <span>FinScope</span>
           </Link>
           {isAuthenticated && (
             <Link to="/projects" className={styles.projectsLink}>Проекты</Link>
@@ -72,7 +72,7 @@ export default function LoginPage() {
 
         <div className={styles.card}>
           <h1 className={styles.title}>Вход</h1>
-          <p className={styles.subtitle}>Добро пожаловать в REGRADAR</p>
+          <p className={styles.subtitle}>Добро пожаловать в FinScope</p>
 
           {error && <div className={styles.error}>{error}</div>}
 

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
 import ProfileDropdown from '../ProfileDropdown/ProfileDropdown.jsx'
+import ProjectSelector from '../ProjectSelector/ProjectSelector.jsx'
 import styles from './Header.module.css'
 
 export default function Header({ project }) {
@@ -11,31 +12,22 @@ export default function Header({ project }) {
         <Link to="/" className={styles.logo}>
           <div className={styles.logoIcon}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="#5b6ef5" strokeWidth="1.5"/>
-              <circle cx="12" cy="12" r="5" stroke="#5b6ef5" strokeWidth="1.5" strokeDasharray="2 2"/>
-              <circle cx="12" cy="12" r="1.5" fill="#5b6ef5"/>
-              <line x1="12" y1="2" x2="12" y2="6" stroke="#5b6ef5" strokeWidth="1.5"/>
+              <circle cx="12" cy="12" r="10" stroke="#224d47" strokeWidth="1.5"/>
+              <circle cx="12" cy="12" r="5" stroke="#224d47" strokeWidth="1.5" strokeDasharray="2 2"/>
+              <circle cx="12" cy="12" r="1.5" fill="#224d47"/>
+              <line x1="12" y1="2" x2="12" y2="6" stroke="#224d47" strokeWidth="1.5"/>
             </svg>
           </div>
-          <span className={styles.logoText}>REGRADAR</span>
+          <span className={styles.logoText}>FinScope</span>
         </Link>
 
         <div className={styles.divider} />
 
-        <button className={styles.projectSelector}>
-          <div className={styles.projectBadge} style={{ background: project.color + '22', borderColor: project.color + '44' }}>
-            <span style={{ color: project.color }}>{project.initials}</span>
-          </div>
-          <span className={styles.projectLabel}>PROJECT</span>
-          <span className={styles.projectName}>{project.name}</span>
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={styles.chevron}>
-            <path d="M2 4L5 7L8 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-        </button>
+        <ProjectSelector currentProject={project} />
       </div>
 
       <nav className={styles.nav}>
-        <a href="#" className={styles.navLink}>DOCUMENTATION</a>
+        {/* <a href="#" className={styles.navLink}>DOCUMENTATION</a> */}
         {isAuthenticated ? (
           <ProfileDropdown />
         ) : (
