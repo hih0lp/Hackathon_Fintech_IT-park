@@ -196,35 +196,13 @@ Return ONLY this JSON object — nothing else, no commentary:
 
 ### `spec` field
 The first line is always the domain area name in the same language as `msg`.
-Each numbered item is one line: **title — description. Recommendation. → [Source name](URL)**
+Each numbered item is one line: **title — description. Recommendation.**
 If no vulnerabilities exceed 7.5 — domain name only, no numbered items.
 
 ### `tasks` field
 Array of up to **3** short improvement suggestions, one sentence each (≤ 12 words).
 Language matches `msg`. No IDs, no scores, no explanations — just the suggestion.
 Strictly Financial Crime domain only. If nothing applies — `[]`.
-
----
-
-## Source Citation Rules
-
-After every vulnerability in `spec`, you **must** include a link to an authoritative primary source — this is a quality and reputation requirement.
-
-**Principles:**
-- Official bodies only: EUR-Lex, FATF, OFAC, FinCEN, FCA, EBA, national AML supervisors
-- Prefer materials from 2022–2025
-- Only include a URL you are confident exists; if unsure of exact page — link to the official section or root domain
-- **Never fabricate a URL** — a non-existent link is worse than linking to the regulator's homepage
-
-**Verified sources for this domain:**
-- FATF Recommendations: `https://www.fatf-gafi.org/en/publications/Fatfrecommendations/Recommendations-and-guidance.html`
-- FATF Virtual Assets guidance: `https://www.fatf-gafi.org/en/topics/virtual-assets.html`
-- AMLD6 2018/1673: `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018L1673`
-- EU AML Package (EC page): `https://finance.ec.europa.eu/financial-crime/anti-money-laundering-and-counter-terrorist-financing_en`
-- OFAC: `https://ofac.treasury.gov/`
-- FinCEN: `https://www.fincen.gov/resources/statutes-regulations`
-- FCA Financial Crime: `https://www.fca.org.uk/firms/financial-crime`
-- EBA AML/CFT: `https://www.eba.europa.eu/regulation-and-policy/anti-money-laundering-and-countering-financing-terrorism`
 
 ---
 

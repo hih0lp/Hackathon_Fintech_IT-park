@@ -1,0 +1,29 @@
+{
+  "eval_id": 1,
+  "configuration": "old_skill",
+  "assertions": [
+    {
+      "text": "Каждая пронумерованная строка в spec содержит '→' и 'http'",
+      "passed": false,
+      "evidence": "No → arrows or URLs found in any spec item. Items end with plain text only (no citations)"
+    },
+    {
+      "text": "Все URL из официальных доменов: fatf-gafi.org, eur-lex.europa.eu, eba.europa.eu, finance.ec.europa.eu",
+      "passed": false,
+      "evidence": "No URLs present in output at all"
+    },
+    {
+      "text": "spec содержит хотя бы одну уязвимость",
+      "passed": true,
+      "evidence": "2 vulnerabilities found (fewer than with_skill which found 4)"
+    },
+    {
+      "text": "Ответ — валидный JSON с полями spec и tasks",
+      "passed": true,
+      "evidence": "Valid JSON, fields: spec (string with 2 items), tasks (array of 3 strings)"
+    }
+  ],
+  "pass_rate": 0.5,
+  "assertions_passed": 2,
+  "assertions_total": 4
+}

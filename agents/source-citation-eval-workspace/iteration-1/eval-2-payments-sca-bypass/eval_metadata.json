@@ -1,0 +1,11 @@
+{
+  "eval_id": 2,
+  "eval_name": "payments-sca-bypass",
+  "prompt": "{\"msg\": \"Хотим ввести fast checkout: для платежей до 150 EUR отключаем 3DS/SCA, чтобы снизить friction. Пользователь просто нажимает кнопку Pay.\", \"context\": \"Платёжный шлюз для e-commerce, лицензия PSP, рынок ЕС, интегрируется через API с мерчантами, обрабатывает карточные транзакции Visa/Mastercard\"}",
+  "assertions": [
+    {"name": "spec_contains_url_arrows", "description": "Каждая пронумерованная строка в spec содержит '→' и 'http'"},
+    {"name": "urls_from_official_domains", "description": "Все URL из: eur-lex.europa.eu, eba.europa.eu, legislation.gov.uk, finance.ec.europa.eu"},
+    {"name": "psd2_mentioned", "description": "Уязвимость про SCA/PSD2 присутствует в spec"},
+    {"name": "valid_json_output", "description": "Ответ — валидный JSON с полями spec и tasks"}
+  ]
+}

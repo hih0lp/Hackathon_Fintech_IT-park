@@ -1,0 +1,29 @@
+{
+  "eval_id": 3,
+  "configuration": "old_skill",
+  "assertions": [
+    {
+      "text": "Каждая пронумерованная строка в spec содержит '→' и 'http'",
+      "passed": false,
+      "evidence": "No → arrows or URLs. Items end with 'GDPR Art. 46, SCC.' / 'GDPR Art. 35.' / 'GDPR Art. 6, ePrivacy Art. 5(3).' — regulation references but no hyperlinks"
+    },
+    {
+      "text": "Все URL из: eur-lex.europa.eu, edpb.europa.eu",
+      "passed": false,
+      "evidence": "No URLs present in output at all"
+    },
+    {
+      "text": "Уязвимость про трансграничную передачу данных присутствует",
+      "passed": true,
+      "evidence": "Item 1 covers 'Schrems II', 'SCCs', GDPR Art. 46"
+    },
+    {
+      "text": "Ответ — валидный JSON с полями spec и tasks",
+      "passed": true,
+      "evidence": "Valid JSON, fields: spec (string with 3 items), tasks (array of 3 strings)"
+    }
+  ],
+  "pass_rate": 0.5,
+  "assertions_passed": 2,
+  "assertions_total": 4
+}

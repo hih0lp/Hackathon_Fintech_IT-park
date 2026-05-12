@@ -1,0 +1,11 @@
+{
+  "eval_id": 1,
+  "eval_name": "financial-crime-kyc-onboarding",
+  "prompt": "{\"msg\": \"Добавляем упрощённый онбординг: пользователь вводит только email и номер телефона, без загрузки документов. Лимиты: до 1000 EUR в месяц, до 200 EUR за транзакцию. Скрининг санкций — только при регистрации.\", \"context\": \"Нeoбанк, лицензия EMI, рынок ЕС (Германия, Франция, Нидерланды), B2C, пользователи физические лица, средний возраст 25-35 лет\"}",
+  "assertions": [
+    {"name": "spec_contains_url_arrows", "description": "Каждая пронумерованная строка в spec содержит '→' и 'http'"},
+    {"name": "urls_from_official_domains", "description": "Все URL из официальных доменов: fatf-gafi.org, eur-lex.europa.eu, ofac.treasury.gov, fincen.gov, fca.org.uk, eba.europa.eu"},
+    {"name": "spec_not_empty", "description": "spec содержит хотя бы одну уязвимость"},
+    {"name": "valid_json_output", "description": "Ответ — валидный JSON с полями spec и tasks"}
+  ]
+}

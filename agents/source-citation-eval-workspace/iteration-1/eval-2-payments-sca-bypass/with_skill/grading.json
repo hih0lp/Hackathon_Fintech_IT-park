@@ -1,0 +1,29 @@
+{
+  "eval_id": 2,
+  "configuration": "with_skill",
+  "assertions": [
+    {
+      "text": "Каждая пронумерованная строка в spec содержит '→' и 'http'",
+      "passed": true,
+      "evidence": "All 4 items end with → [Name](https://...): EBA Payments x2, PSD2 EUR-Lex x2"
+    },
+    {
+      "text": "Все URL из: eur-lex.europa.eu, eba.europa.eu, legislation.gov.uk, finance.ec.europa.eu",
+      "passed": true,
+      "evidence": "Domains used: eba.europa.eu ✓, eur-lex.europa.eu ✓"
+    },
+    {
+      "text": "Уязвимость про SCA/PSD2 присутствует в spec",
+      "passed": true,
+      "evidence": "'PSD2' mentioned 3 times, 'SCA' mentioned 4 times, 'RTS on SCA' mentioned"
+    },
+    {
+      "text": "Ответ — валидный JSON с полями spec и tasks",
+      "passed": true,
+      "evidence": "Valid JSON, fields: spec (string with 4 items), tasks (array of 3 strings)"
+    }
+  ],
+  "pass_rate": 1.0,
+  "assertions_passed": 4,
+  "assertions_total": 4
+}

@@ -109,7 +109,7 @@ score = ((prod_blocker × 1.5) + dev_cost) / 2.5
 **`spec`:**
 - Первая строка: название домена на языке `msg`
 - Далее: нумерованный список уязвимостей по убыванию score
-- Каждый пункт: краткий, actionable, на языке `msg`, завершается ссылкой на источник: `→ [Название](URL)`
+- Каждый пункт: краткий, actionable, на языке `msg`
 - Без score, расчётов и внутренних заметок
 
 **`tasks`:**
@@ -135,26 +135,6 @@ score = ((prod_blocker × 1.5) + dev_cost) / 2.5
   "tasks": ["..."]
 }
 ```
-
----
-
-## Правила цитирования источников
-
-После каждой уязвимости в `spec` **обязательно** добавляй ссылку на авторитетный первоисточник — это требование к качеству и репутации анализа.
-
-**Принципы:**
-- Только официальные органы: EUR-Lex, EBA, EC, FCA, национальные ЦБ
-- Приоритет — материалы 2022–2025
-- Указывай только URL, в котором уверен; не знаешь точную страницу — ссылайся на официальный раздел органа
-- **Запрещено выдумывать URL** — несуществующая ссылка хуже ссылки на главный сайт органа
-
-**Проверенные источники этого домена:**
-- PSD2 2015/2366: `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015L2366`
-- PSD3 Proposal 2023: `https://finance.ec.europa.eu/publications/payment-services-psd2-directive-review_en`
-- DORA 2022/2554: `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R2554`
-- EBA Payments & SCA: `https://www.eba.europa.eu/regulation-and-policy/payment-services-and-electronic-money`
-- PSR 2024 (UK): `https://www.legislation.gov.uk/uksi/2024/692`
-- EC Payments Policy: `https://finance.ec.europa.eu/consumer-finance-and-payments/payment-services_en`
 
 ---
 

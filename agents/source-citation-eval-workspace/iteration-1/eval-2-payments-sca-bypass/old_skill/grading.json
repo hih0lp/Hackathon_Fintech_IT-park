@@ -1,0 +1,29 @@
+{
+  "eval_id": 2,
+  "configuration": "old_skill",
+  "assertions": [
+    {
+      "text": "Каждая пронумерованная строка в spec содержит '→' и 'http'",
+      "passed": false,
+      "evidence": "No → arrows or URLs found. Items end with plain regulatory references only"
+    },
+    {
+      "text": "Все URL из: eur-lex.europa.eu, eba.europa.eu, legislation.gov.uk, finance.ec.europa.eu",
+      "passed": false,
+      "evidence": "No URLs present in output at all"
+    },
+    {
+      "text": "Уязвимость про SCA/PSD2 присутствует в spec",
+      "passed": true,
+      "evidence": "'PSD2' mentioned, 'SCA' mentioned, 'RTS Art.16' and 'RTS Art.18' mentioned"
+    },
+    {
+      "text": "Ответ — валидный JSON с полями spec и tasks",
+      "passed": true,
+      "evidence": "Valid JSON, fields: spec (string with 3 items), tasks (array of 3 strings)"
+    }
+  ],
+  "pass_rate": 0.5,
+  "assertions_passed": 2,
+  "assertions_total": 4
+}

@@ -1,0 +1,29 @@
+{
+  "eval_id": 3,
+  "configuration": "with_skill",
+  "assertions": [
+    {
+      "text": "Каждая пронумерованная строка в spec содержит '→' и 'http'",
+      "passed": true,
+      "evidence": "All 4 items end with → [Name](https://...): ePrivacy EUR-Lex, GDPR EUR-Lex x2, SCC Decision EUR-Lex"
+    },
+    {
+      "text": "Все URL из: eur-lex.europa.eu, edpb.europa.eu",
+      "passed": true,
+      "evidence": "All URLs use eur-lex.europa.eu ✓ (CELEX format for ePrivacy, GDPR, SCC Decision)"
+    },
+    {
+      "text": "Уязвимость про трансграничную передачу данных присутствует",
+      "passed": true,
+      "evidence": "Item 3 explicitly covers 'SCC 2021/914', 'EU-US Data Privacy Framework', 'Schrems II' context, GDPR Art. 44-49"
+    },
+    {
+      "text": "Ответ — валидный JSON с полями spec и tasks",
+      "passed": true,
+      "evidence": "Valid JSON, fields: spec (string with 4 items), tasks (array of 3 strings)"
+    }
+  ],
+  "pass_rate": 1.0,
+  "assertions_passed": 4,
+  "assertions_total": 4
+}

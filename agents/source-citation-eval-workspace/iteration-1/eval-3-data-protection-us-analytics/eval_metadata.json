@@ -1,0 +1,11 @@
+{
+  "eval_id": 3,
+  "eval_name": "data-protection-us-analytics",
+  "prompt": "{\"msg\": \"Подключаем Google Analytics 4 и Meta Pixel для поведенческой аналитики пользователей. Данные уходят на серверы в США автоматически при каждом визите.\", \"context\": \"B2C SaaS платформа для финансового планирования, пользователи из ЕС (Германия, Польша, Испания), MVP стадия, данные включают email, паттерны поведения, финансовые цели\"}",
+  "assertions": [
+    {"name": "spec_contains_url_arrows", "description": "Каждая пронумерованная строка в spec содержит '→' и 'http'"},
+    {"name": "urls_from_official_domains", "description": "Все URL из: eur-lex.europa.eu, edpb.europa.eu"},
+    {"name": "schrems_or_scc_mentioned", "description": "Уязвимость про трансграничную передачу данных присутствует"},
+    {"name": "valid_json_output", "description": "Ответ — валидный JSON с полями spec и tasks"}
+  ]
+}

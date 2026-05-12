@@ -124,7 +124,7 @@ Sort included vulnerabilities by `normalized_score` descending (highest first).
 
 Format each item concisely (max 2 sentences):
 ```
-N) [Short title] — [problem and fix in 1-2 sentences]. [Regulation reference]. → [Source name](URL)
+N) [Short title] — [problem and fix in 1-2 sentences]. [Regulation reference].
 ```
 
 Scores are used only for internal filtering and sorting — never include scores or any internal metadata in the output.
@@ -163,7 +163,7 @@ Return:
 ### Example Output
 ```json
 {
-  "spec": "Защита данных и конфиденциальность\n1) Передача данных в США без действующего механизма — после Schrems II передача персональных данных в США через GA4/Meta Pixel без SCCs является незаконной. Заключить SCCs с Google/Meta или перейти на EU-hosted аналитику. GDPR Art. 46, SCC. → [SCC Decision 2021/914](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D0914)\n2) Отсутствие lawful basis для поведенческого профилирования — профилирование через пиксели требует явного opt-in согласия. Без consent banner фича незаконна. GDPR Art. 6, ePrivacy Art. 5(3). → [GDPR 2016/679](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679)\n3) DPIA обязательна до запуска — масштабное профилирование пользователей ЕС требует оценки воздействия на данные. Риск штрафа до 4% оборота. GDPR Art. 35. → [EDPB DPIA Guidelines](https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-92017-data-protection-impact-assessment_en)",
+  "spec": "Защита данных и конфиденциальность\n1) Передача данных в США без действующего механизма — после Schrems II передача персональных данных в США через GA4/Meta Pixel без SCCs является незаконной. Заключить SCCs с Google/Meta или перейти на EU-hosted аналитику. GDPR Art. 46, SCC.\n2) Отсутствие lawful basis для поведенческого профилирования — профилирование через пиксели требует явного opt-in согласия. Без consent banner фича незаконна. GDPR Art. 6, ePrivacy Art. 5(3).\n3) DPIA обязательна до запуска — масштабное профилирование пользователей ЕС требует оценки воздействия на данные. Риск штрафа до 4% оборота. GDPR Art. 35.",
   "tasks": [
     "Внедрить consent management platform (CMP) с раздельным opt-in для аналитики и маркетинга.",
     "Заключить DPA с каждым аналитическим провайдером (Google, Meta) по GDPR Art. 28.",
@@ -172,25 +172,6 @@ Return:
   ]
 }
 ```
-
----
-
-## Source Citation Rules
-
-After every vulnerability in `spec`, you **must** include a link to an authoritative primary source — this is a quality and reputation requirement.
-
-**Principles:**
-- Official bodies only: EUR-Lex, EDPB, EDPS, national DPAs, NIST
-- Prefer materials from 2022–2025
-- Only include a URL you are confident exists; if unsure of the exact page — link to the official section or root domain
-- **Never fabricate a URL** — a non-existent link is worse than linking to the regulator's homepage
-
-**Verified sources for this domain:**
-- GDPR 2016/679: `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679`
-- ePrivacy Directive 2002/58/EC: `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32002L0058`
-- EU Data Act 2023/2854: `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R2854`
-- SCC Decision 2021/914: `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D0914`
-- EDPB Guidelines & Opinions: `https://www.edpb.europa.eu/our-work-tools/our-documents_en`
 
 ---
 

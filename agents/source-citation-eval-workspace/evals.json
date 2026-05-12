@@ -1,0 +1,102 @@
+{
+  "skill_name": "domain-agents-source-citation",
+  "description": "Проверка что все 3 тестируемых агента (financial-crime, payments, data-protection) включают ссылки на источники в каждой уязвимости spec",
+  "evals": [
+    {
+      "id": 1,
+      "name": "financial-crime-kyc-onboarding",
+      "prompt": "{\"msg\": \"Добавляем упрощённый онбординг: пользователь вводит только email и номер телефона, без загрузки документов. Лимиты: до 1000 EUR в месяц, до 200 EUR за транзакцию. Скрининг санкций — только при регистрации.\", \"context\": \"Нeoбанк, лицензия EMI, рынок ЕС (Германия, Франция, Нидерланды), B2C, пользователи физические лица, средний возраст 25-35 лет\"}",
+      "agent": "financial-crime-integrity",
+      "skill_path": "C:\\Users\\User\\Desktop\\Hahathon\\agents\\financial-crime-integrity-agent-service\\skill\\financial-crime-integrity\\SKILL.md",
+      "baseline_path": "C:\\Users\\User\\Desktop\\Hahathon\\agents\\source-citation-eval-workspace\\baseline-financial-crime-SKILL.md",
+      "expected_output": "JSON с полем spec, где каждая уязвимость завершается стрелкой и ссылкой на источник в формате → [Название](URL)",
+      "assertions": [
+        {
+          "name": "spec_contains_url_arrows",
+          "description": "Каждая пронумерованная строка в spec содержит '→' и 'http'",
+          "type": "regex_per_vulnerability_line"
+        },
+        {
+          "name": "urls_from_official_domains",
+          "description": "Все URL принадлежат официальным доменам: fatf-gafi.org, eur-lex.europa.eu, ofac.treasury.gov, fincen.gov, fca.org.uk, eba.europa.eu, finance.ec.europa.eu",
+          "type": "domain_whitelist_check"
+        },
+        {
+          "name": "spec_not_empty",
+          "description": "spec содержит хотя бы одну уязвимость (KYC-только-email явно должен триггерить)",
+          "type": "min_vulnerability_count",
+          "min": 1
+        },
+        {
+          "name": "valid_json_output",
+          "description": "Ответ — валидный JSON с полями spec и tasks",
+          "type": "json_schema"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "payments-sca-bypass",
+      "prompt": "{\"msg\": \"Хотим ввести fast checkout: для платежей до 150 EUR отключаем 3DS/SCA, чтобы снизить friction. Пользователь просто нажимает кнопку Pay.\", \"context\": \"Платёжный шлюз для e-commerce, лицензия PSP, рынок ЕС, интегрируется через API с мерчантами, обрабатывает карточные транзакции Visa/Mastercard\"}",
+      "agent": "payments-vulnerability",
+      "skill_path": "C:\\Users\\User\\Desktop\\Hahathon\\agents\\payments-vulnerability-agent-service\\skill\\payments-vulnerability-agent\\SKILL.md",
+      "baseline_path": "C:\\Users\\User\\Desktop\\Hahathon\\agents\\source-citation-eval-workspace\\baseline-payments-SKILL.md",
+      "expected_output": "JSON с полем spec, где каждая уязвимость завершается стрелкой и ссылкой на источник в формате → [Название](URL)",
+      "assertions": [
+        {
+          "name": "spec_contains_url_arrows",
+          "description": "Каждая пронумерованная строка в spec содержит '→' и 'http'",
+          "type": "regex_per_vulnerability_line"
+        },
+        {
+          "name": "urls_from_official_domains",
+          "description": "Все URL из: eur-lex.europa.eu, eba.europa.eu, legislation.gov.uk, finance.ec.europa.eu",
+          "type": "domain_whitelist_check"
+        },
+        {
+          "name": "psd2_mentioned",
+          "description": "Уязвимость про SCA/PSD2 присутствует в spec (SCA bypass — явный блокер)",
+          "type": "keyword_in_spec",
+          "keywords": ["PSD2", "SCA", "RTS", "3DS"]
+        },
+        {
+          "name": "valid_json_output",
+          "description": "Ответ — валидный JSON с полями spec и tasks",
+          "type": "json_schema"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "data-protection-us-analytics",
+      "prompt": "{\"msg\": \"Подключаем Google Analytics 4 и Meta Pixel для поведенческой аналитики пользователей. Данные уходят на серверы в США автоматически при каждом визите.\", \"context\": \"B2C SaaS платформа для финансового планирования, пользователи из ЕС (Германия, Польша, Испания), MVP стадия, данные включают email, паттерны поведения, финансовые цели\"}",
+      "agent": "data-protection",
+      "skill_path": "C:\\Users\\User\\Desktop\\Hahathon\\agents\\data-protection-agent-service\\skill\\data-protection-agent\\SKILL.md",
+      "baseline_path": "C:\\Users\\User\\Desktop\\Hahathon\\agents\\source-citation-eval-workspace\\baseline-data-protection-SKILL.md",
+      "expected_output": "JSON с полем spec, где каждая уязвимость завершается стрелкой и ссылкой на источник в формате → [Source name](URL)",
+      "assertions": [
+        {
+          "name": "spec_contains_url_arrows",
+          "description": "Каждая пронумерованная строка в spec содержит '→' и 'http'",
+          "type": "regex_per_vulnerability_line"
+        },
+        {
+          "name": "urls_from_official_domains",
+          "description": "Все URL из: eur-lex.europa.eu, edpb.europa.eu, edps.europa.eu",
+          "type": "domain_whitelist_check"
+        },
+        {
+          "name": "schrems_or_scc_mentioned",
+          "description": "Уязвимость про трансграничную передачу данных в США присутствует",
+          "type": "keyword_in_spec",
+          "keywords": ["Schrems", "SCC", "SCCs", "Art. 46", "трансграничн"]
+        },
+        {
+          "name": "valid_json_output",
+          "description": "Ответ — валидный JSON с полями spec и tasks",
+          "type": "json_schema"
+        }
+      ]
+    }
+  ]
+}
