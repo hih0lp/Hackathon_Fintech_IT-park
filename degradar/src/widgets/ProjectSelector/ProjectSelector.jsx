@@ -72,10 +72,7 @@ export default function ProjectSelector({ currentProject, onProjectChange }) {
     color: '#999'
   })
 
-  console.log('ProjectSelector - currentProject:', currentProject)
-  console.log('ProjectSelector - projectsList:', projectsList)
-  console.log('ProjectSelector - displayProject:', displayProject)
-
+  
   return (
     <div className={styles.projectSelector} ref={dropdownRef}>
       <button className={styles.selectorButton} onClick={handleToggleDropdown}>

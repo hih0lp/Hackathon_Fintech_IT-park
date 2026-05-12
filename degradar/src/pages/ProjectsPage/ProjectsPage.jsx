@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { projects } from '../../api/client'
+import { projects, yougile } from '../../api/client'
 import { useAuth } from '../../context/AuthContext.jsx'
 import ProfileDropdown from '../../widgets/ProfileDropdown/ProfileDropdown.jsx'
+import AgileModal from '../../widgets/AgileModal/AgileModal.jsx'
 import styles from './ProjectsPage.module.css'
 
 const availableCountries = [
@@ -49,9 +50,17 @@ export default function ProjectsPage() {
     description: '',
     countries: [],
     files: [],
+    sync_with_yougile: false
   })
   const [selectedCountry, setSelectedCountry] = useState('')
   const [showCountryDropdown, setShowCountryDropdown] = useState(false)
+  const [showAgileModal, setShowAgileModal] = useState(false)
+  const [isYougileAuthenticated, setIsYougileAuthenticated] = useState(yougile.isAuthenticated())
+  const [yougileAuth, setYougileAuth] = useState({
+    login: '',
+    password: '',
+    companyId: ''
+  })
   const countryDropdownRef = useRef(null)
   const menuRef = useRef(null)
   const filesRef = useRef(null)
@@ -105,33 +114,53 @@ export default function ProjectsPage() {
       description: '',
       countries: [],
       files: [],
+      sync_with_yougile: false
     })
     setSelectedCountry('')
     setShowCountryDropdown(false)
+    setShowAgileModal(false)
   }
 
   const handleSubmitProject = async (e) => {
     e.preventDefault()
     if (!newProject.title.trim()) return
 
+    // Check if user tries to sync with YouGile without authentication
+    if (newProject.sync_with_yougile && !isYougileAuthenticated) {
+      setError('Для синхронизации с YouGile необходимо сначала авторизоваться')
+      return
+    }
+
     try {
       const formData = new FormData()
       formData.append('title', newProject.title)
       formData.append('description', newProject.description || '')
       formData.append('country', newProject.countries.join(', '))
+      
+      if (newProject.files.length > 0) {
+        newProject.files.forEach(fileObj => {
+          if (fileObj.file) {
+            formData.append('uploaded_files', fileObj.file)
+          }
+        })
+      } else {
+        formData.append('uploaded_files', null)
+      }
 
-      newProject.files.forEach(fileObj => {
-        if (fileObj.file) {
-          formData.append('uploaded_files', fileObj.file)
-        }
-      })
+      // Add sync_with_yougile flag
+      formData.append('sync_with_yougile', newProject.sync_with_yougile.toString())
 
       if (editingProjectId) {
-        await projects.partialUpdate(editingProjectId, {
+        const updateData = {
           title: newProject.title,
           description: newProject.description,
           country: newProject.countries.join(', ')
-        })
+        }
+        
+        // Add sync_with_yougile flag to update
+        updateData.sync_with_yougile = newProject.sync_with_yougile
+        
+        await projects.partialUpdate(editingProjectId, updateData)
       } else {
         await projects.create(formData)
       }
@@ -156,12 +185,35 @@ export default function ProjectsPage() {
 
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files)
-    const newFiles = files.map(file => ({
-      name: file.name,
-      file: file,
-      url: URL.createObjectURL(file)
-    }))
-    setNewProject(prev => ({ ...prev, files: [...prev.files, ...newFiles] }))
+    const allowedFormats = ['.doc', '.docx', '.pdf', '.xls', '.xlsx']
+    const validFiles = []
+    const invalidFiles = []
+
+    files.forEach(file => {
+      const fileExtension = '.' + file.name.split('.').pop().toLowerCase()
+      if (allowedFormats.includes(fileExtension)) {
+        validFiles.push(file)
+      } else {
+        invalidFiles.push(file.name)
+      }
+    })
+
+    if (invalidFiles.length > 0) {
+      setError(`Недопустимые форматы файлов: ${invalidFiles.join(', ')}. Разрешены только: ${allowedFormats.join(', ')}`)
+      setTimeout(() => setError(''), 5000)
+    }
+
+    if (validFiles.length > 0) {
+      const newFiles = validFiles.map(file => ({
+        name: file.name,
+        file: file,
+        url: URL.createObjectURL(file)
+      }))
+      setNewProject(prev => ({ ...prev, files: [...prev.files, ...newFiles] }))
+    }
+
+    // Clear the input
+    e.target.value = ''
   }
 
   const removeFile = (fileName) => {
@@ -220,6 +272,40 @@ export default function ProjectsPage() {
   const handleLogout = () => {
     logout()
     navigate('/')
+  }
+
+  const handleYougileAuth = async (e) => {
+    e.preventDefault()
+    try {
+      await yougile.authenticate(yougileAuth.login, yougileAuth.password, yougileAuth.companyId)
+      yougile.setAuthenticated(true)
+      setIsYougileAuthenticated(true)
+      setError('')
+      setYougileAuth({ login: '', password: '', companyId: '' })
+    } catch (err) {
+      setError(err.message || 'Ошибка авторизации в Yougile')
+    }
+  }
+
+  const handleYougileLogout = () => {
+    yougile.logout()
+    setIsYougileAuthenticated(false)
+  }
+
+  const handleBindAgile = () => {
+    setShowAgileModal(true)
+  }
+
+  const handleAgileSubmit = async (formData) => {
+    try {
+      await yougile.authenticate(formData.username, formData.password, formData.companyId)
+      yougile.setAuthenticated(true)
+      setIsYougileAuthenticated(true)
+      setShowAgileModal(false)
+    } catch (error) {
+      console.error('Failed to bind Agile:', error)
+      throw error
+    }
   }
 
   return (
@@ -446,6 +532,23 @@ export default function ProjectsPage() {
               </button>
             </div>
 
+            {/* Error display in modal */}
+            {error && (
+              <div className={styles.modalError}>
+                <div className={styles.errorContent}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.errorIcon}>
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                  <div className={styles.errorText}>
+                    <div className={styles.errorTitle}>Ошибка создания проекта</div>
+                    <div className={styles.errorDescription}>{error}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmitProject} className={styles.modalForm}>
               <div className={styles.formGroup}>
                 <label htmlFor="projectName">Название проекта *</label>
@@ -523,6 +626,24 @@ export default function ProjectsPage() {
               <div className={styles.formGroup}>
                 <label>Файлы</label>
                 <div className={styles.uploadSection}>
+                  {/* Static file formats */}
+                  <div className={styles.staticFormats}>
+                    <div className={styles.formatsLabel}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                      </svg>
+                      <span>Поддерживаемые форматы:</span>
+                    </div>
+                    <div className={styles.formatsList}>
+                      {['.doc', '.docx', '.pdf', '.xls', '.xlsx'].map(format => (
+                        <span key={format} className={styles.formatTag}>
+                          {format}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
                   {newProject.files.length > 0 && (
                     <div className={styles.uploadedFiles}>
                       {newProject.files.map(file => (
@@ -546,6 +667,7 @@ export default function ProjectsPage() {
                     <input
                       type="file"
                       multiple
+                      accept=".doc,.docx,.pdf,.xls,.xlsx"
                       onChange={handleFileUpload}
                       style={{ display: 'none' }}
                     />
@@ -557,6 +679,40 @@ export default function ProjectsPage() {
                     <span>Загрузить файлы</span>
                   </label>
                 </div>
+              </div>
+
+              {/* YouGile Integration Section */}
+              <div className={styles.formGroup}>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={newProject.sync_with_yougile}
+                    onChange={(e) => setNewProject(prev => ({ ...prev, sync_with_yougile: e.target.checked }))}
+                    disabled={!isYougileAuthenticated}
+                  />
+                  <span className={styles.checkboxText}>
+                    Синхронизировать с YouGile
+                    {!isYougileAuthenticated && (
+                      <span className={styles.requiredAuth}> (требуется авторизация)</span>
+                    )}
+                  </span>
+                </label>
+                
+                {!isYougileAuthenticated && (
+                  <button
+                    type="button"
+                    className={styles.bindAgileBtn}
+                    onClick={handleBindAgile}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                      <circle cx="8.5" cy="7" r="4"/>
+                      <line x1="20" y1="8" x2="20" y2="14"/>
+                      <line x1="23" y1="11" x2="17" y2="11"/>
+                    </svg>
+                    Привязать Agile
+                  </button>
+                )}
               </div>
 
               <div className={styles.modalActions}>
@@ -571,6 +727,12 @@ export default function ProjectsPage() {
           </div>
         </div>
       )}
-    </div>
+    
+    <AgileModal
+      isOpen={showAgileModal}
+      onClose={() => setShowAgileModal(false)}
+      onSubmit={handleAgileSubmit}
+    />
+  </div>
   )
 }

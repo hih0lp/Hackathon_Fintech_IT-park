@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import styles from './RadarPage.module.css'
 import ChatPanel from '../../features/radar/ui/ChatPanel/ChatPanel.jsx'
 import TaskPanel from '../../widgets/TaskPanel/TaskPanel.jsx'
-import ChatSelector from '../../features/radar/ui/ChatSelector/ChatSelector.jsx'
+import FeatureList from '../../features/radar/ui/FeatureList/FeatureList.jsx'
 import Header from '../../widgets/Header/Header.jsx'
 import { projects, chats, auth } from '../../api/client'
 import { createWebSocketClient } from '../../api/websocket.js'
@@ -24,8 +24,9 @@ export default function RadarPage() {
   const [selectedChat, setSelectedChat] = useState(null)
   const [currentProject, setCurrentProject] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [connectionStatus, setConnectionStatus] = useState('disconnected')
+  const [connectionStatus, setConnectionStatus] = useState('loading')
   const [error, setError] = useState(null)
+  const [isChatBlocked, setIsChatBlocked] = useState(false)
   
   const projectId = searchParams.get('project')
   const featureId = searchParams.get('feature')
@@ -103,6 +104,22 @@ export default function RadarPage() {
     }
   }, [projectId])
 
+  // Handle chat selection change
+  const handleChatSelection = (chat) => {
+    console.log('Chat selected:', chat)
+    
+    // Initialize WebSocket connection for the selected chat
+    if (chat && chat.id) {
+      // Only reconnect if chat ID changed or no existing connection
+      if (!wsClientRef.current || selectedChat?.id !== chat.id) {
+        setSelectedChat(chat) // Set before initializing WebSocket
+        initWebSocketConnection(chat.id)
+      } else {
+        setSelectedChat(chat) // Still update the selected chat even if not reconnecting
+      }
+    }
+  }
+
   // Load features for the project
   useEffect(() => {
     if (!currentProject) {
@@ -130,9 +147,19 @@ export default function RadarPage() {
         // Select the requested feature or the first one
         if (featureId) {
           const requestedFeature = formattedFeatures.find(f => f.id === parseInt(featureId))
-          setSelectedChat(requestedFeature || formattedFeatures[0])
+          const chatToSelect = requestedFeature || formattedFeatures[0]
+          console.log('useEffect: requested chat to select:', chatToSelect?.id, 'current selected:', selectedChat?.id)
+          if (chatToSelect && selectedChat?.id !== chatToSelect.id) {
+            console.log('useEffect: selecting different chat')
+            handleChatSelection(chatToSelect)
+          } else {
+            console.log('useEffect: chat already selected or no chat to select')
+          }
+        } else if (formattedFeatures.length > 0 && (!selectedChat || !formattedFeatures.find(f => f.id === selectedChat.id))) {
+          console.log('useEffect: selecting first available chat')
+          handleChatSelection(formattedFeatures[0])
         } else {
-          setSelectedChat(formattedFeatures[0])
+          console.log('useEffect: no chat selection needed')
         }
       } catch (error) {
         console.error('Failed to load features:', error)
@@ -149,9 +176,25 @@ export default function RadarPage() {
     console.log('=== WebSocket Debug ===')
     console.log('1. isAuthenticated:', isAuthenticated)
     console.log('2. chatId:', chatId)
+    console.log('3. Current connection exists:', !!wsClientRef.current)
+    
+    // Prevent multiple initialization for the same chat
+    if (wsClientRef.current && selectedChat?.id === chatId && wsClientRef.current.getStatus() === 'connected') {
+      console.log('WebSocket already connected to this chat, skipping initialization')
+      return
+    }
+    
+    // Close existing connection if any
+    if (wsClientRef.current) {
+      console.log('Closing existing WebSocket connection')
+      wsClientRef.current.close()
+      wsClientRef.current = null
+    }
     
     // Reset processing state on new connection
     setIsProcessing(false)
+    setIsChatBlocked(false) // Reset chat blocked state
+    setMessages([]) // Clear messages when switching chats
     if (processingTimeoutRef.current) {
       clearTimeout(processingTimeoutRef.current)
       processingTimeoutRef.current = null
@@ -196,7 +239,11 @@ export default function RadarPage() {
       
       wsClientRef.current.on('error', (errorMessage) => {
         console.error('WebSocket error:', errorMessage)
-        setError(errorMessage || 'Ошибка соединения')
+        // Handle Event objects properly
+        const errorText = typeof errorMessage === 'string' 
+          ? errorMessage 
+          : errorMessage?.message || errorMessage?.type || 'Ошибка соединения'
+        setError(errorText)
       })
       
       wsClientRef.current.on('history', (historyMessages) => {
@@ -211,14 +258,27 @@ export default function RadarPage() {
       })
       
       wsClientRef.current.on('chat_message', (data) => {
-        console.log('Received chat message echo:', data)
         const message = {
           id: data.timestamp || Date.now(),
           type: data.sender === 'user' ? 'user' : 'bot',
           text: data.message,
           timestamp: data.timestamp
         }
-        setMessages(prev => [...prev, message])
+        
+        // Avoid duplicate messages - check if message with same content and type already exists
+        setMessages(prev => {
+          const isDuplicate = prev.some(msg => 
+            msg.type === message.type && 
+            msg.text === message.text && 
+            Math.abs(new Date(msg.timestamp) - new Date(message.timestamp)) < 5000 // Within 5 seconds
+          )
+          
+          if (isDuplicate && message.type === 'user') {
+            return prev // Don't add duplicate user messages
+          }
+          
+          return [...prev, message]
+        })
       })
       
       wsClientRef.current.on('processing_started', () => {
@@ -246,6 +306,10 @@ export default function RadarPage() {
         // Clear any previous errors
         setError(null)
         
+        // Check if tasks are present and block chat if they are
+        const hasTasks = data.tasks && data.tasks.length > 0
+        setIsChatBlocked(hasTasks)
+        
         const message = {
           id: Date.now(),
           type: 'bot',
@@ -260,6 +324,11 @@ export default function RadarPage() {
         console.error('Max reconnect attempts reached')
         setError('Не удалось установить соединение с сервером')
         setConnectionStatus('failed')
+        // Clean up failed connection
+        if (wsClientRef.current) {
+          wsClientRef.current.close()
+          wsClientRef.current = null
+        }
       })
       
       // Connect to WebSocket
@@ -273,22 +342,25 @@ export default function RadarPage() {
 
   // Send message through WebSocket
   const handleSendMessage = (text) => {
-    console.log('=== Send Message Debug ===')
-    console.log('1. Text to send:', text)
-    console.log('2. wsClientRef.current exists:', !!wsClientRef.current)
-    console.log('3. connectionStatus:', connectionStatus)
-    
     if (!wsClientRef.current || connectionStatus !== 'connected') {
-      console.error('WebSocket not connected - cannot send message')
       setError('Нет соединения с сервером')
       return false
     }
     
-    console.log('4. Attempting to send message...')
+    // Add message locally immediately for better UX
+    const localMessage = {
+      id: Date.now(),
+      type: 'user',
+      text: text,
+      timestamp: new Date().toISOString()
+    }
+    setMessages(prev => [...prev, localMessage])
+    
     const success = wsClientRef.current.sendMessage(text)
-    console.log('5. Message sent, success:', success)
     
     if (!success) {
+      // Remove the message if sending failed
+      setMessages(prev => prev.filter(msg => msg.id !== localMessage.id))
       setError('Не удалось отправить сообщение')
     }
     
@@ -319,6 +391,37 @@ export default function RadarPage() {
   // Delete task
   const handleDeleteTask = (taskId) => {
     setTasks(prev => prev.filter(task => task.id !== taskId))
+  }
+
+  // Handle chat deletion
+  const handleDeleteChat = async (chatId) => {
+    try {
+      console.log('Deleting chat:', chatId)
+      await chats.delete(chatId)
+      
+      // Update features list
+      setFeatures(prev => prev.filter(chat => chat.id !== chatId))
+      
+      // If deleted chat was selected, select another one or clear selection
+      if (selectedChat?.id === chatId) {
+        const remainingChats = features.filter(chat => chat.id !== chatId)
+        if (remainingChats.length > 0) {
+          handleChatSelection(remainingChats[0])
+        } else {
+          setSelectedChat(null)
+          // Close WebSocket connection
+          if (wsClientRef.current) {
+            wsClientRef.current.close()
+            wsClientRef.current = null
+          }
+          setMessages([])
+          setConnectionStatus('disconnected')
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete chat:', error)
+      throw error // Re-throw to let ChatSelector handle the error state
+    }
   }
 
   return (
@@ -352,11 +455,12 @@ export default function RadarPage() {
                 </div>
               )}
               
-              {/* Chat selector */}
-              <ChatSelector 
-                chats={features}
-                selectedChat={selectedChat}
-                onSelectChat={setSelectedChat}
+              {/* Feature list */}
+              <FeatureList 
+                features={features}
+                selectedFeature={selectedChat}
+                onSelectFeature={handleChatSelection}
+                onDeleteFeature={handleDeleteChat}
               />
               
               {/* Chat panel */}
@@ -366,6 +470,7 @@ export default function RadarPage() {
                 isProcessing={isProcessing}
                 connectionStatus={connectionStatus}
                 onAcceptTask={handleAddTask}
+                isChatBlocked={isChatBlocked}
               />
             </>
           )}

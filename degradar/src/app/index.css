@@ -1,5 +1,5 @@
 /* ====================== GLOBAL RESET & BASE ====================== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Using system fonts instead of Google Fonts to avoid loading issues */
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -41,7 +41,7 @@
   --status-low-bg: rgba(22, 163, 74, 0.08);
   --status-safe-bg: rgba(5, 150, 105, 0.08);
 
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   font-size: 13px;
   line-height: 1.5;
   color: var(--text-primary);

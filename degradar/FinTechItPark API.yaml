@@ -68,6 +68,111 @@ paths:
           description: ''
         '400':
           description: Ошибка валидации
+  /chats/{chat_id}/ask/:
+    post:
+      operationId: chats_ask_create
+      description: Принимает сообщение пользователя (поле `msg`). Контекст (история
+        чата и данные проекта) формируется автоматически. Возвращает `request_id`
+        для последующего опроса статуса.
+      summary: Отправить сообщение нейросети
+      parameters:
+      - in: path
+        name: chat_id
+        schema:
+          type: integer
+        description: ID чата
+        required: true
+      tags:
+      - chats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                msg:
+                  type: string
+                  description: Текст сообщения пользователя
+              required:
+              - msg
+      security:
+      - jwtAuth: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request_id:
+                    type: integer
+                  status:
+                    type: string
+                    enum:
+                    - pending
+          description: Задача поставлена в очередь
+        '400':
+          description: Отсутствует поле msg
+        '403':
+          description: Нет доступа к чату
+        '404':
+          description: Чат не найден
+  /chats/{chat_id}/ask/{request_id}/:
+    get:
+      operationId: chats_ask_retrieve
+      description: Возвращает текущий статус запроса к нейросети. Если завершён —
+        возвращает ответ бота и сгенерированные задачи.
+      summary: Статус обработки сообщения
+      parameters:
+      - in: path
+        name: chat_id
+        schema:
+          type: integer
+        description: ID чата
+        required: true
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        description: ID запроса (получен при отправке)
+        required: true
+      tags:
+      - chats
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                    - pending
+                    - processing
+                    - completed
+                    - failed
+                  request_id:
+                    type: integer
+                  result_text:
+                    type: string
+                    nullable: true
+                  tasks:
+                    type: array
+                    items:
+                      type: object
+                    nullable: true
+                  error:
+                    type: string
+                    nullable: true
+          description: Успешный ответ (статус может быть completed, pending, processing
+            или failed)
+        '403':
+          description: Нет доступа
+        '404':
+          description: Запрос или чат не найден
   /chats/{chat_id}/messages/:
     get:
       operationId: chats_messages_list

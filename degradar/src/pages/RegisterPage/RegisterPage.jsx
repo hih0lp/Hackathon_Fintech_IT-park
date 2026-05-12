@@ -47,7 +47,7 @@ export default function RegisterPage() {
       await auth.register(formData.email, formData.password, formData.confirmPassword)
       console.log('Registration successful')
       localStorage.setItem('pendingEmail', formData.email)
-      navigate('/verify')
+      navigate('/login')
     } catch (err) {
       console.error('Registration error:', err)
       setError(err.message || 'Ошибка регистрации')
@@ -86,7 +86,7 @@ export default function RegisterPage() {
                 type="email"
                 id="email"
                 name="email"
-                value={formData.email}
+                value={formData.email.toLowercase}
                 onChange={handleChange}
                 placeholder="ваш@email.com"
                 className={styles.input}

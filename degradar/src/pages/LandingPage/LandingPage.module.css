@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+/* Using system fonts instead of Google Fonts to avoid loading issues */
 
 /* ======= VARIABLES ======= */
 :root {

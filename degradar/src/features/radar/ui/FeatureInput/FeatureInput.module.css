@@ -1,5 +1,5 @@
 .container {
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-primary);
   border-radius: 10px;
   overflow: hidden;
   background: var(--bg-card);
@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 14px;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-primary);
   background: var(--bg-secondary);
 }
 
@@ -18,7 +18,7 @@
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .realtime {
@@ -46,7 +46,7 @@
 .textarea {
   width: 100%;
   background: var(--bg-input);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   color: var(--text-secondary);
   font-family: 'Inter', sans-serif;
@@ -59,12 +59,12 @@
 }
 
 .textarea:focus {
-  border-color: var(--accent-blue);
+  border-color: var(--border-focus);
   color: var(--text-primary);
 }
 
 .textarea::placeholder {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .inputActions {
@@ -84,9 +84,9 @@
   align-items: center;
   gap: 5px;
   background: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-secondary);
   border-radius: 6px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -97,8 +97,8 @@
 }
 
 .attachBtn:hover {
-  border-color: var(--text-muted);
-  color: var(--text-secondary);
+  border-color: var(--border-focus);
+  color: var(--text-primary);
 }
 
 .initBtn {
@@ -106,17 +106,17 @@
   align-items: center;
   gap: 8px;
   padding: 8px 18px;
-  background: linear-gradient(135deg, #224d47, #224d47);
+  background: var(--gradient-primary);
   border: none;
   border-radius: 8px;
-  color: white;
+  color: var(--text-inverse);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
   transition: opacity 0.2s, transform 0.1s;
-  box-shadow: 0 0 20px rgba(34, 77, 71, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .initBtn:hover:not(:disabled) {
@@ -132,8 +132,8 @@
 .spinner {
   width: 12px;
   height: 12px;
-  border: 1.5px solid rgba(255,255,255,0.3);
-  border-top-color: white;
+  border: 1.5px solid var(--text-inverse);
+  border-top-color: var(--text-inverse);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }

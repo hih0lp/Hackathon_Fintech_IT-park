@@ -1,11 +1,12 @@
 import { useState } from 'react'
+import VoiceInput from '../VoiceInput/VoiceInput.jsx'
 import styles from './ChatPanel.module.css'
 
-export default function ChatPanel({ messages, onSend, onAcceptTask, isProcessing, connectionStatus }) {
+export default function ChatPanel({ messages, onSend, onAcceptTask, isProcessing, connectionStatus, isChatBlocked }) {
   const [input, setInput] = useState('')
 
   const handleSend = () => {
-    if (input.trim() && connectionStatus === 'connected' && !isProcessing) {
+    if (input.trim() && connectionStatus === 'connected' && !isProcessing && !isChatBlocked) {
       const success = onSend(input)
       if (success) {
         setInput('')
@@ -71,6 +72,7 @@ export default function ChatPanel({ messages, onSend, onAcceptTask, isProcessing
                                 className={styles.acceptBtn}
                                 onClick={() => onAcceptTask(taskData)}
                                 title="Добавить в список дел"
+                                disabled={isProcessing}
                               >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                                   <path d="M5 12l5 5L19 7" strokeLinecap="round" strokeLinejoin="round"/>
@@ -90,7 +92,7 @@ export default function ChatPanel({ messages, onSend, onAcceptTask, isProcessing
 
         {/* Processing indicator */}
         {isProcessing && (
-          <div className={`${styles.message} ${styles.bot}`}>
+          <div className={`${styles.message} ${styles.bot} ${styles.processing}`}>
             <div className={styles.botAvatar}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="#224d47" strokeWidth="1.5"/>
@@ -99,9 +101,11 @@ export default function ChatPanel({ messages, onSend, onAcceptTask, isProcessing
             </div>
             <div className={styles.bubble}>
               <div className={styles.skeleton}>
-                <div className={styles.skeletonLine} style={{width: '80%'}}></div>
-                <div className={styles.skeletonLine} style={{width: '60%'}}></div>
-                <div className={styles.skeletonLine} style={{width: '90%'}}></div>
+                <div className={styles.skeletonLine} style={{width: '85%', animationDelay: '0s'}}></div>
+                <div className={styles.skeletonLine} style={{width: '65%', animationDelay: '0.2s'}}></div>
+                <div className={styles.skeletonLine} style={{width: '75%', animationDelay: '0.4s'}}></div>
+                <div className={styles.skeletonLine} style={{width: '55%', animationDelay: '0.6s'}}></div>
+                <div className={styles.skeletonLine} style={{width: '70%', animationDelay: '0.8s'}}></div>
               </div>
             </div>
           </div>
@@ -109,30 +113,34 @@ export default function ChatPanel({ messages, onSend, onAcceptTask, isProcessing
       </div>
 
       <div className={styles.inputRow}>
-        <div className={styles.inputWrap}>
+        <div className={`${styles.inputWrap} ${isProcessing ? styles.processing : ''}`}>
           <input
             type="text"
             className={styles.input}
             placeholder={
-              connectionStatus === 'connected' 
+              isChatBlocked
+                ? "Чат заблокирован - есть задачи для выполнения"
+                : connectionStatus === 'connected' 
                 ? isProcessing 
                   ? "Обработка запроса..." 
-                  : "Задать вопрос ассистенту..."
+                  : "Задайте вопрос ассистенту максимально точно и корректно..."
                 : connectionStatus === 'connecting'
                 ? "Подключение к серверу..."
+                : connectionStatus === 'loading'
+                ? "Загрузка чата..."
                 : "Нет соединения с сервером"
             }
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKey}
-            disabled={connectionStatus !== 'connected' || isProcessing}
+            disabled={connectionStatus !== 'connected' || isProcessing || isChatBlocked}
           />
           <button 
             className={styles.sendBtn} 
             onClick={handleSend} 
-            disabled={!input.trim() || connectionStatus !== 'connected' || isProcessing}
+            disabled={!input.trim() || connectionStatus !== 'connected' || isProcessing || isChatBlocked}
           >
-            {isProcessing ? (
+            {isProcessing || connectionStatus === 'loading' ? (
               <div className={styles.spinner}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeDasharray="31.4" strokeDashoffset="31.4">
@@ -146,6 +154,19 @@ export default function ChatPanel({ messages, onSend, onAcceptTask, isProcessing
               </svg>
             )}
           </button>
+        
+        {/* Voice Input */}
+        <VoiceInput 
+          onSendMessage={(message) => {
+            if (connectionStatus === 'connected' && !isProcessing && !isChatBlocked) {
+              const success = onSend(message)
+              if (success) {
+                setInput('')
+              }
+            }
+          }}
+          disabled={connectionStatus !== 'connected' || isProcessing || isChatBlocked}
+        />
         </div>
         
         {/* Connection status indicator */}
@@ -157,6 +178,14 @@ export default function ChatPanel({ messages, onSend, onAcceptTask, isProcessing
               {connectionStatus === 'disconnected' && 'Нет соединения'}
               {connectionStatus === 'failed' && 'Ошибка соединения'}
             </span>
+          </div>
+        )}
+        
+        {/* Chat blocked indicator */}
+        {isChatBlocked && (
+          <div className={styles.statusIndicator}>
+            <div className={`${styles.statusDot} ${styles.blocked}`}></div>
+            <span className={styles.statusText}>Чат заблокирован - выполните задачи</span>
           </div>
         )}
       </div>

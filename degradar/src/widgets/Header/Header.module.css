@@ -5,7 +5,7 @@
   height: 48px;
   padding: 0 20px;
   background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-primary);
   flex-shrink: 0;
   z-index: 100;
 }
@@ -46,7 +46,7 @@
 .divider {
   width: 1px;
   height: 20px;
-  background: var(--border);
+  background: var(--text-secondary);
   margin: 0 16px;
 }
 
@@ -55,7 +55,7 @@
   align-items: center;
   gap: 8px;
   background: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-primary);
   border-radius: 6px;
   padding: 4px 10px 4px 6px;
   cursor: pointer;
@@ -63,7 +63,7 @@
 }
 
 .projectSelector:hover {
-  border-color: #2a2d40;
+  border-color: var(--accent-hover);
   background: var(--bg-card);
 }
 
@@ -83,7 +83,7 @@
 .projectLabel {
   font-size: 9px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   letter-spacing: 0.06em;
   line-height: 1;
 }
@@ -96,7 +96,7 @@
 }
 
 .chevron {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .nav {
@@ -123,7 +123,7 @@
   height: 28px;
   border-radius: 50%;
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-primary);
   color: var(--text-secondary);
   cursor: pointer;
   display: flex;
@@ -133,7 +133,7 @@
 }
 
 .userBtn:hover {
-  border-color: var(--accent-blue);
+  border-color: var(--border-focus);
   color: var(--text-primary);
 }
 
@@ -144,7 +144,7 @@
   padding: 6px 12px;
   border-radius: 6px;
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-primary);
   color: var(--text-secondary);
   text-decoration: none;
   font-size: 11px;
@@ -155,7 +155,7 @@
 }
 
 .accountBtn:hover {
-  border-color: var(--accent-blue);
+  border-color: var(--border-focus);
   color: var(--text-primary);
 }
 

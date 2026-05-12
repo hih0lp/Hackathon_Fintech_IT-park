@@ -112,14 +112,7 @@ export class ChatWebSocket {
 
   // Отправка сообщения
   sendMessage(text) {
-    console.log('=== WebSocket Send Debug ===');
-    console.log('1. isConnected:', this.isConnected);
-    console.log('2. ws.readyState:', this.ws.readyState);
-    console.log('3. WebSocket.OPEN constant:', WebSocket.OPEN);
-    
-    if (!this.isConnected || this.ws.readyState !== WebSocket.OPEN) {
-      console.error('WebSocket is not connected');
-      console.error('Expected readyState:', WebSocket.OPEN, 'Got:', this.ws.readyState);
+    if (!this.isConnected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
       return false;
     }
 
@@ -128,9 +121,7 @@ export class ChatWebSocket {
         type: 'message',
         message: text
       };
-      console.log('4. Sending message:', message);
       this.ws.send(JSON.stringify(message));
-      console.log('5. Message sent successfully');
       return true;
     } catch (error) {
       console.error('Error sending message:', error);
@@ -140,6 +131,12 @@ export class ChatWebSocket {
 
   // Отправка ping для поддержания соединения
   sendPing() {
+    // Дополнительная проверка на существование WebSocket
+    if (!this.ws) {
+      console.warn('WebSocket is null, cannot send ping');
+      return;
+    }
+    
     if (this.isConnected && this.ws.readyState === WebSocket.OPEN) {
       try {
         const ping = {
@@ -155,7 +152,12 @@ export class ChatWebSocket {
 
   // Запуск ping интервала
   startPing() {
-    this.stopPing();
+    // Предотвращаем множественные интервалы
+    if (this.pingInterval) {
+      console.log('Ping interval already exists, stopping it first');
+      this.stopPing();
+    }
+    
     this.pingInterval = setInterval(() => {
       this.sendPing();
     }, 30000); // Каждые 30 секунд
@@ -174,6 +176,12 @@ export class ChatWebSocket {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('Max reconnect attempts reached');
       this.emit('max_reconnect_attempts');
+      return;
+    }
+
+    // Don't reconnect if manually closed
+    if (this.ws && this.ws.readyState === WebSocket.CLOSED && this.reconnectAttempts === 0) {
+      console.log('WebSocket was closed manually, not reconnecting');
       return;
     }
 
@@ -196,6 +204,11 @@ export class ChatWebSocket {
       this.messageHandlers.set(event, []);
     }
     this.messageHandlers.get(event).push(handler);
+  }
+
+  // Очистка всех обработчиков событий
+  clearAllHandlers() {
+    this.messageHandlers.clear();
   }
 
   // Отписка от событий
@@ -226,6 +239,7 @@ export class ChatWebSocket {
   close() {
     this.stopPing();
     this.reconnectAttempts = this.maxReconnectAttempts; // Предотвращаем переподключение
+    this.clearAllHandlers(); // Очищаем все обработчики событий
     
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.close(1000, 'Client disconnect');

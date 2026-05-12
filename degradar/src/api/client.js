@@ -225,6 +225,18 @@ export const chats = {
     const query = new URLSearchParams(params).toString()
     return apiRequest(`/chats/${chatId}/messages/${query ? '?' + query : ''}`)
   },
+
+  sendMessage: async (chatId, message) => {
+    const response = await apiRequest(`/chats/${chatId}/ask/`, {
+      method: 'POST',
+      body: JSON.stringify({ msg: message }),
+    })
+    return response
+  },
+
+  getMessageStatus: async (chatId, requestId) => {
+    return apiRequest(`/chats/${chatId}/ask/${requestId}/`)
+  },
 }
 
 // Tasks API
@@ -257,4 +269,27 @@ export const tasks = {
   delete: (id) => apiRequest(`/tasks/${id}/`, { method: 'DELETE' }),
 }
 
-export default { auth, projects, chats, tasks }
+// Yougile API
+export const yougile = {
+  authenticate: (login, password, companyId) =>
+    apiRequest('/users/yougile/auth/', {
+      method: 'POST',
+      body: JSON.stringify({ login, password, companyId }),
+    }),
+
+  logout: () => {
+    localStorage.removeItem('yougileAuth')
+    setCookie('yougileAuth', '', -1)
+  },
+
+  isAuthenticated: () => {
+    return localStorage.getItem('yougileAuth') === 'true' || getCookie('yougileAuth') === 'true'
+  },
+
+  setAuthenticated: (status) => {
+    localStorage.setItem('yougileAuth', status.toString())
+    setCookie('yougileAuth', status.toString(), 30)
+  }
+}
+
+export default { auth, projects, chats, tasks, yougile }

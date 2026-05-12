@@ -485,8 +485,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 9999;
     animation: fade-in 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 @keyframes fade-in {
@@ -514,6 +516,8 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
     animation: modal-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
+    margin: auto;
+    transform: translateZ(0);
 }
 
 /* Декоративная полоса сверху с анимированным градиентом */
@@ -816,6 +820,53 @@
     padding: 20px;
 }
 
+.staticFormats {
+    background: linear-gradient(135deg, rgba(91, 110, 245, 0.05) 0%, rgba(91, 110, 245, 0.02) 100%);
+    border: 1px solid rgba(91, 110, 245, 0.15);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.formatsLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 12px;
+}
+
+.formatsLabel svg {
+    color: #6366f1;
+}
+
+.formatsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.formatTag {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #4f46e5;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    transition: all 0.2s ease;
+}
+
+.formatTag:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.08) 100%);
+    border-color: rgba(99, 102, 241, 0.3);
+    transform: translateY(-1px);
+}
+
 .uploadedFiles {
     display: flex;
     flex-wrap: wrap;
@@ -1085,4 +1136,319 @@
     .fileInputRow {
         flex-direction: column;
     }
+}
+
+/* YouGile Integration Styles */
+.collapsibleSection {
+    border: 2px solid rgba(34, 77, 71, 0.1);
+    border-radius: 14px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(34, 77, 71, 0.02) 0%, rgba(34, 77, 71, 0.01) 100%);
+}
+
+.collapsibleHeader {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.collapsibleHeader:hover {
+    background: rgba(34, 77, 71, 0.05);
+}
+
+.collapsibleTitle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 0.95rem;
+}
+
+.collapsibleTitle svg {
+    color: #224d47;
+    flex-shrink: 0;
+}
+
+.optionalBadge {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 8px;
+}
+
+.collapsibleChevron {
+    color: #6b7280;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.collapsibleChevron.chevronOpen {
+    transform: rotate(180deg);
+}
+
+.collapsibleContent {
+    padding: 0 20px 20px;
+    border-top: 1px solid rgba(34, 77, 71, 0.1);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.integrationDescription {
+    margin: 16px 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.integrationFields {
+    display: grid;
+    gap: 16px;
+}
+
+.fieldGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fieldGroup label {
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.fieldGroup input {
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.fieldGroup input:focus {
+    outline: none;
+    border-color: #224d47;
+    box-shadow: 0 0 0 3px rgba(34, 77, 71, 0.1);
+}
+
+.fieldGroup input::placeholder {
+    color: #9ca3af;
+}
+
+/* Yougile Authentication Styles */
+.yougileAuthenticated {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.authStatus {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    border: 1px solid #86efac;
+    border-radius: 10px;
+    color: #166534;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.authStatus svg {
+    flex-shrink: 0;
+}
+
+.logoutBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    color: #dc2626;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: fit-content;
+}
+
+.logoutBtn:hover {
+    background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+    border-color: #f87171;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+}
+
+.yougileAuthForm {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.authBtn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #224d47 0%, #3d6b62 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(34, 77, 71, 0.2);
+}
+
+.authBtn:hover {
+    background: linear-gradient(135deg, #1a3d38 0%, #2d5249 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(34, 77, 71, 0.3);
+}
+
+.authBtn:active {
+    transform: translateY(0);
+}
+
+/* Checkbox and Bind Agile Styles */
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.checkboxLabel input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.checkboxLabel input[type="checkbox"]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.checkboxLabel input[type="checkbox"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.checkboxText {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.requiredAuth {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.bindAgileBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, rgba(34, 77, 71, 0.1) 0%, rgba(34, 77, 71, 0.05) 100%);
+    border: 1px solid rgba(34, 77, 71, 0.2);
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+}
+
+.bindAgileBtn:hover {
+    background: linear-gradient(135deg, rgba(34, 77, 71, 0.15) 0%, rgba(34, 77, 71, 0.08) 100%);
+    border-color: rgba(34, 77, 71, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 77, 71, 0.1);
+}
+
+.bindAgileBtn svg {
+    flex-shrink: 0;
+}
+
+/* Enhanced Error Display Styles */
+.modalError {
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 1px solid #fca5a5;
+    border-radius: 12px;
+    padding: 16px;
+    animation: error-shake 0.5s ease-in-out;
+}
+
+@keyframes error-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.errorContent {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.errorIcon {
+    color: #dc2626;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.errorText {
+    flex: 1;
+}
+
+.errorTitle {
+    font-weight: 600;
+    color: #dc2626;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+
+.errorDescription {
+    color: #991b1b;
+    font-size: 0.9rem;
+    line-height: 1.4;
 }

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useEffect } from 'react'
 import LandingPage from '../pages/LandingPage/LandingPage.jsx'
 import LoginPage from '../pages/LoginPage/LoginPage.jsx'
 import RegisterPage from '../pages/RegisterPage/RegisterPage.jsx'
@@ -8,8 +9,14 @@ import ProjectPage from '../pages/ProjectPage/ProjectPage.jsx'
 import RadarPage from '../pages/RadarPage/RadarPage.jsx'
 import AccountPage from '../pages/AccountPage/AccountPage.jsx'
 import { AuthProvider } from '../context/AuthContext.jsx'
+import initializeGlobalFunctions from '../utils/globalFunctions.js'
 
 export default function App() {
+  useEffect(() => {
+    // Initialize global functions for voice commands
+    initializeGlobalFunctions()
+  }, [])
+
   return (
     <AuthProvider>
       <BrowserRouter>

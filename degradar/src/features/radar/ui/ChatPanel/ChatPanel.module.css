@@ -32,13 +32,13 @@
 }
 
 .messages::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.3);
+  background: var(--border-secondary);
   border-radius: 3px;
   transition: background 0.2s;
 }
 
 .messages::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.5);
+  background: var(--text-tertiary);
 }
 
 .message {
@@ -76,38 +76,34 @@
 }
 
 .user .bubble {
-  background: linear-gradient(135deg, #224d47, #224d47);
-  border: 1px solid rgba(34, 77, 71, 0.3);
-  color: white;
+  background: var(--gradient-primary);
+  border: 1px solid var(--accent-primary);
+  color: var(--text-inverse);
   border-bottom-right-radius: 4px;
-  box-shadow: 
-    0 4px 12px rgba(34, 77, 71, 0.2),
-    0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .bot .bubble {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  color: #334155;
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
   border-bottom-left-radius: 4px;
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.05),
-    0 2px 4px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--shadow-sm);
 }
 
 .userAvatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-  border: 2px solid rgba(91, 110, 245, 0.2);
+  background: var(--gradient-secondary);
+  border: 2px solid var(--border-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #64748b;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease;
 }
 
@@ -119,15 +115,13 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #224d47, #224d47);
-  border: 2px solid rgba(34, 77, 71, 0.3);
+  background: var(--gradient-primary);
+  border: 2px solid var(--accent-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 
-    0 4px 12px rgba(34, 77, 71, 0.3),
-    0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   transition: transform 0.2s ease;
   animation: pulse 2s infinite;
 }
@@ -137,8 +131,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 4px 12px rgba(91, 110, 245, 0.3), 0 2px 4px rgba(0, 0, 0, 0.1); }
-  50% { box-shadow: 0 4px 16px rgba(91, 110, 245, 0.4), 0 2px 6px rgba(0, 0, 0, 0.15); }
+  0%, 100% { box-shadow: var(--shadow-md); }
+  50% { box-shadow: var(--shadow-lg); }
 }
 
 .inputRow {
@@ -149,21 +143,30 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid var(--border-primary);
   border-radius: 12px;
   padding: 8px 8px 8px 16px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .inputWrap:focus-within {
-  border-color: rgba(91, 110, 245, 0.4);
-  box-shadow: 
-    0 4px 12px rgba(91, 110, 245, 0.1),
-    0 2px 4px rgba(0, 0, 0, 0.05);
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
+}
+
+.inputWrap.processing {
+  border-color: var(--accent-hover);
+  background: var(--bg-tertiary);
+  box-shadow: var(--shadow-md);
+}
+
+.inputWrap.processing:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-lg);
 }
 
 .input {
@@ -171,40 +174,46 @@
   background: none;
   border: none;
   outline: none;
-  color: #334155;
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   padding: 8px 0;
-  transition: color 0.2s ease;
-}
-
-.input::placeholder {
-  color: #94a3b8;
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 .input:focus {
-  color: #1e293b;
+  color: var(--text-primary);
+}
+
+.input:disabled {
+  color: var(--text-tertiary);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.input:disabled::placeholder {
+  color: var(--text-secondary);
 }
 
 .sendBtn {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #224d47, #224d47);
+  background: var(--gradient-primary);
   border: none;
-  color: white;
+  color: var(--text-inverse);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(34, 77, 71, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .sendBtn:hover:not(:disabled) {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 20px rgba(34, 77, 71, 0.4);
+  box-shadow: var(--shadow-lg);
 }
 
 .sendBtn:active:not(:disabled) {
@@ -228,6 +237,7 @@
 }
 
 .emptyIcon {
+  
   margin-bottom: 24px;
   width: 80px;
   height: 80px;
@@ -252,6 +262,8 @@
   margin: 0 0 12px 0;
   line-height: 1.3;
 }
+
+
 
 .emptyText {
   font-size: 16px;
@@ -315,9 +327,17 @@
   transition: all 0.2s;
 }
 
-.acceptBtn:hover {
+.acceptBtn:hover:not(:disabled) {
   background: #bbf7d0;
   transform: translateY(-1px);
+}
+
+.acceptBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #9ca3af;
 }
 
 .rejectBtn {
@@ -391,6 +411,11 @@
   background: #ef4444;
 }
 
+.statusDot.blocked {
+  background: #f59e0b;
+  animation: pulse 2s infinite;
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
@@ -406,22 +431,49 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding: 4px 0;
 }
 
 .skeletonLine {
-  height: 12px;
+  height: 14px;
   background: linear-gradient(90deg, 
-    rgba(148, 163, 184, 0.2) 0%, 
-    rgba(148, 163, 184, 0.4) 50%, 
-    rgba(148, 163, 184, 0.2) 100%
+    #e2e8f0 0%, 
+    #f1f5f9 25%,
+    #f8fafc 50%,
+    #f1f5f9 75%,
+    #e2e8f0 100%
   );
   border-radius: 4px;
+  background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
+  min-width: 90px;
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% { 
+    background-position: -200% 0;
+  }
+  100% { 
+    background-position: 200% 0;
+  }
+}
+
+/* Loading avatar animation - only apply during processing */
+.message.processing .botAvatar svg {
+  animation: rotate 2s linear infinite;
+}
+
+.message.processing .botAvatar {
+  opacity: 0.8;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Mobile responsiveness */

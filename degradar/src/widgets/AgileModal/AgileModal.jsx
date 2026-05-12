@@ -4,7 +4,8 @@ import styles from './AgileModal.module.css'
 export default function AgileModal({ isOpen, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
     username: '',
-    companyId: ''
+    companyId: '',
+    password: ''
   })
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -27,7 +28,7 @@ export default function AgileModal({ isOpen, onClose, onSubmit }) {
       document.addEventListener('mousedown', handleClickOutside)
       document.addEventListener('keydown', handleEscape)
       // Reset form when modal opens
-      setFormData({ username: '', companyId: '' })
+      setFormData({ username: '', companyId: '', password: '' })
       setErrors({})
     }
 
@@ -57,22 +58,31 @@ export default function AgileModal({ isOpen, onClose, onSubmit }) {
       newErrors.companyId = 'ID компании обязателен'
     }
     
+    if (!formData.password.trim()) {
+      newErrors.password = 'Пароль обязателен'
+    }
+    
     return newErrors
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    console.log('Form submitted with data:', formData)
     
     const newErrors = validateForm()
+    console.log('Validation errors:', newErrors)
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
       return
     }
     
     setIsSubmitting(true)
+    console.log('Starting submission...')
     
     try {
+      console.log('Calling onSubmit with:', formData)
       await onSubmit(formData)
+      console.log('onSubmit completed successfully')
       onClose()
     } catch (error) {
       console.error('Failed to bind Agile:', error)
@@ -134,6 +144,23 @@ export default function AgileModal({ isOpen, onClose, onSubmit }) {
               disabled={isSubmitting}
             />
             {errors.companyId && <span className={styles.errorMessage}>{errors.companyId}</span>}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="password" className={styles.formLabel}>
+              Пароль
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Введите пароль"
+              className={`${styles.formInput} ${errors.password ? styles.error : ''}`}
+              disabled={isSubmitting}
+            />
+            {errors.password && <span className={styles.errorMessage}>{errors.password}</span>}
           </div>
 
           {errors.submit && <div className={styles.submitError}>{errors.submit}</div>}
