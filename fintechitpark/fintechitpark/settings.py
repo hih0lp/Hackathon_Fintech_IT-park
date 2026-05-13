@@ -248,3 +248,20 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
 MAX_CHAT_VERSIONS = 10
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'project.yougile_service': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
