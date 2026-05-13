@@ -301,6 +301,20 @@
   box-shadow: none;
 }
 
+.yougileAuthRequired {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .spinner {
   animation: spin 1s linear infinite;
 }
