@@ -167,6 +167,16 @@ Score используется только для внутренней филь
 - ESMA MiCA Hub: `https://www.esma.europa.eu/esmas-activities/digital-finance-and-innovation/markets-crypto-assets-regulation-mica`
 - FATF Recommendations: `https://www.fatf-gafi.org/en/publications/Fatfrecommendations/Recommendations-and-guidance.html`
 
+**Приоритет источников по юрисдикции из `context`:**
+Определи географию фичи и выбирай источники регуляторов именно этой юрисдикции:
+- **ЕС / EEA**: EUR-Lex MiCA, ESMA, EBA; для конкретной страны — национальный крипто-регулятор (BaFin DE, AMF FR, AFM NL и др.)
+- **UK**: FCA (crypto registration), legislation.gov.uk
+- **США**: SEC, CFTC, FinCEN
+- **Глобальный**: FATF, BIS, IOSCO
+- **Несколько юрисдикций**: приводи источники для каждой из них
+
+Инструмент `web_search` доступен — используй для проверки актуальности регуляции (поправки 2024–2025), поиска свежих enforcement-решений и подтверждения URL перед включением в вывод.
+
 ---
 
 ## Поле tasks — предложения по улучшению

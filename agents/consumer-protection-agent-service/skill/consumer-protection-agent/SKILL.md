@@ -161,6 +161,15 @@ Score используется только для внутренней филь
 - Digital Services Act 2022/2065: `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R2065`
 - EBA Consumer Protection: `https://www.eba.europa.eu/consumer-corner/consumer-protection`
 
+**Приоритет источников по юрисдикции из `context`:**
+Определи географию фичи и выбирай источники регуляторов именно этой юрисдикции:
+- **ЕС / EEA**: EUR-Lex, EBA, EC; для конкретной страны — также национальный регулятор защиты потребителей (BaFin DE, AMF FR, KNF PL и др.)
+- **UK**: legislation.gov.uk, FCA, CMA (Competition and Markets Authority)
+- **США**: CFPB, FTC
+- **Несколько юрисдикций**: приводи источники для каждой из них
+
+Инструмент `web_search` доступен — используй для проверки актуальности нормы (поправки 2024–2025), поиска свежих enforcement-решений регулятора в данной юрисдикции и подтверждения URL перед включением в вывод.
+
 ---
 
 ## Поле tasks — предложения по улучшению

@@ -192,6 +192,15 @@ After every vulnerability in `spec`, you **must** include a link to an authorita
 - SCC Decision 2021/914: `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D0914`
 - EDPB Guidelines & Opinions: `https://www.edpb.europa.eu/our-work-tools/our-documents_en`
 
+**Jurisdiction-based source priority:**
+Read the `context` field to identify the feature's geography, then prioritize sources from the relevant regulators:
+- **EU / EEA**: EUR-Lex, EDPB, EC; for a specific country — also include the national DPA (BfDI DE, CNIL FR, UODO PL, AEPD ES, etc.)
+- **UK**: legislation.gov.uk, ICO (Information Commissioner's Office)
+- **US**: FTC, state-level privacy laws (CCPA → California AG, etc.)
+- **Multiple jurisdictions**: include sources for each
+
+The `web_search` tool is available — use it to verify that a regulation is still current (2024–2025 amendments), find recent DPA enforcement decisions in the relevant jurisdiction, and confirm URLs before including them.
+
 ---
 
 ## Edge Cases

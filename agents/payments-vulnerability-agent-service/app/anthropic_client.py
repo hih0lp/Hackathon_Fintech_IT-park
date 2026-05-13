@@ -9,6 +9,15 @@ from .config import Settings
 from .schemas import AnalyzeRequest
 
 
+_WEB_SEARCH_TOOLS: list[dict] = [
+    {
+        "type": "web_search_20250305",
+        "name": "web_search",
+        "max_uses": 5,
+    }
+]
+
+
 def build_user_payload(request: AnalyzeRequest) -> str:
     return json.dumps(
         {
@@ -39,6 +48,8 @@ async def stream_anthropic_events(
             temperature=settings.anthropic_temperature,
             system=system_prompt,
             messages=[{"role": "user", "content": payload}],
+            tools=_WEB_SEARCH_TOOLS,
+            extra_headers={"anthropic-beta": "web-search-2025-03-05"},
         ) as stream:
             async for text in stream.text_stream:
                 full_text += text

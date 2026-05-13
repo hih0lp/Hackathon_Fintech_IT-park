@@ -226,6 +226,16 @@ After every vulnerability in `spec`, you **must** include a link to an authorita
 - FCA Financial Crime: `https://www.fca.org.uk/firms/financial-crime`
 - EBA AML/CFT: `https://www.eba.europa.eu/regulation-and-policy/anti-money-laundering-and-countering-financing-terrorism`
 
+**Jurisdiction-based source priority:**
+Read the `context` field to identify the feature's geography, then prioritize sources from the relevant regulators:
+- **EU / EEA**: EUR-Lex AML directives, EBA, EC; for a specific country — national FIU or AML supervisor (BaFin DE, AMF FR, DNB NL, ACPR FR, etc.)
+- **UK**: FCA, NCA (National Crime Agency), legislation.gov.uk (MLR 2017)
+- **US**: FinCEN, OFAC, FinRA, SEC
+- **Global / crypto**: FATF, BIS, Wolfsberg Group
+- **Multiple jurisdictions**: include sources for each
+
+The `web_search` tool is available — use it to verify that a regulation is still current (2024–2025 amendments), find recent enforcement actions (fines, license revocations) in the relevant jurisdiction, and confirm URLs before including them.
+
 ---
 
 ## Tone & Precision

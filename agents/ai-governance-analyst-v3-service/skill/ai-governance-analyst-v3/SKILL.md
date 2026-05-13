@@ -171,6 +171,16 @@ score = (1.5 * severity_score + dev_cost_score) / 2.5
 - EC European AI Strategy: `https://digital-strategy.ec.europa.eu/en/policies/european-approach-artificial-intelligence`
 - ENISA AI: `https://www.enisa.europa.eu/topics/artificial-intelligence`
 
+**Приоритет источников по юрисдикции из `context`:**
+Определи географию фичи и выбирай источники регуляторов именно этой юрисдикции:
+- **ЕС / EEA**: EUR-Lex, EC, ENISA; для конкретной страны — также национальный регулятор (BaFin DE, CNIL FR, ICO UK и др.)
+- **UK**: legislation.gov.uk, ICO, FCA
+- **США**: NIST, FTC, федеральные AI-инициативы
+- **Глобальный**: OECD, ISO/IEC, ITU
+- **Несколько юрисдикций**: приводи источники для каждой из них
+
+Инструмент `web_search` доступен — используй для проверки актуальности регуляции (поправки 2024–2025), поиска свежих enforcement-решений регулятора в данной юрисдикции и подтверждения URL перед включением в вывод.
+
 **Формат пункта `spec` с источником:**
 ```
 N) [Поддомен] Название — описание риска и рекомендация. Основание: Регуляция, статья. → [Название](URL)
