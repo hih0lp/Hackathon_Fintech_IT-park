@@ -1,5 +1,7 @@
 import mimetypes
 import os
+import pprint
+
 import django
 import json
 
@@ -64,7 +66,8 @@ def call_llm(llm_request_id: int, chat_id: int, user_message: str, context_text:
                 raise Exception(f"LLM service returned {response.status_code}: {response.text[:200]}")
 
             response_text = response.text
-            print(f"Raw response: {response_text[:500]}")
+
+            pprint.pprint(response_text)
 
             # Парсим SSE формат
             result = None
