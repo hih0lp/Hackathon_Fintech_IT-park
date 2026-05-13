@@ -48,7 +48,7 @@ def call_llm(llm_request_id: int, chat_id: int, user_message: str, context_text:
         data = {
             'msg': user_message,
             'context_text': context_text,
-            'add-agents': custom_agents
+            'add-agents': json.dumps(custom_agents, ensure_ascii=False)
         }
 
         # 3. POST-запрос к LLM
