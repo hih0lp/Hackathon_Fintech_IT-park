@@ -2,10 +2,12 @@ import { useState } from 'react'
 import VoiceInput from '../VoiceInput/VoiceInput.jsx'
 import styles from './ChatPanel.module.css'
 
-// Convert **text** markdown to <strong>text</strong> HTML
+// Convert **text** markdown to <strong>text</strong> HTML and handle line breaks
 const formatBoldText = (text) => {
   if (!text) return ''
-  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>')
 }
 
 export default function ChatPanel({ messages, onSend, onAcceptTask, isProcessing, connectionStatus, isChatBlocked }) {

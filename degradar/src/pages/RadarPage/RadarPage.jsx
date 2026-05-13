@@ -18,6 +18,13 @@ const getProjectColor = (id) => projectColors[(id - 1) % projectColors.length]
 
 const getInitials = (name) => name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
 
+// Check if user is authenticated in YouGile
+const isYouGileAuthenticated = () => {
+  const cookies = document.cookie.split(';').map(c => c.trim())
+  const yougileAuthCookie = cookies.find(c => c.startsWith('yougileAuth='))
+  return yougileAuthCookie?.split('=')[1] === 'true'
+}
+
 export default function RadarPage() {
   const { isAuthenticated } = useAuth()
   const [searchParams] = useSearchParams()
@@ -175,6 +182,15 @@ export default function RadarPage() {
     loadFeatures()
   }, [currentProject, featureId])
 
+  // Update chat block status when tasks or messages change
+  useEffect(() => {
+    const hasPendingTasks = tasks.some(task => task.status === 'pending')
+    const hasSuggestedTasks = messages.some(msg => 
+      msg.suggestedTasks && msg.suggestedTasks.length > 0
+    )
+    setIsChatBlocked(hasPendingTasks || hasSuggestedTasks)
+  }, [tasks, messages])
+
   // Initialize WebSocket connection
   const initWebSocketConnection = (chatId) => {
     console.log('=== WebSocket Debug ===')
@@ -310,9 +326,9 @@ export default function RadarPage() {
         // Clear any previous errors
         setError(null)
         
-        // Check if tasks are present and block chat if they are
-        const hasTasks = data.tasks && data.tasks.length > 0
-        setIsChatBlocked(hasTasks)
+        // Block chat if there are suggested tasks in the message
+        const hasSuggestedTasks = data.tasks && data.tasks.length > 0
+        setIsChatBlocked(hasSuggestedTasks || tasks.some(task => task.status === 'pending'))
         
         const message = {
           id: Date.now(),
@@ -580,6 +596,7 @@ export default function RadarPage() {
             onClearCompleted={handleClearCompleted}
             onSendToYouGile={handleSendToYouGile}
             isSendingToYouGile={isSendingToYouGile}
+            isYouGileAuthenticated={isYouGileAuthenticated()}
           />
         </aside>
       </div>
