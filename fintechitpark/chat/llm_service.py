@@ -101,17 +101,20 @@ def call_llm(llm_request_id: int, chat_id: int, user_message: str, context_text:
         elif result.get('type') == 'done':
             result_data = result.get('result', {})
             agents_data = result_data.get('agents', {})
+            custom_agents_data = result_data.get('custom_agents', {})  # <- добавить
             action = result_data.get('action', 'unknown')
+
+            # Объединяем оба словаря (агенты из custom_agents имеют приоритет или просто дополняем)
+            all_agents = {**agents_data, **custom_agents_data}
 
             msg_parts = []
             all_tasks = []
             if action and action != 'unknown':
                 msg_parts.append(f"🏷️ **Действие:** {action}\n")
 
-            for agent_name, agent_result in agents_data.items():
+            for agent_name, agent_result in all_agents.items():
                 spec = agent_result.get('spec', '')
-                print(f"Processing agent: {agent_name}, spec length: {len(spec)}")
-                if spec and spec != "...":
+                if spec and spec.strip() and spec != "...":
                     msg_parts.append(f"\n**{agent_name.replace('_', ' ').title()}**:\n")
                     lines = spec.strip().split('\n')
                     for line in lines:
@@ -126,10 +129,8 @@ def call_llm(llm_request_id: int, chat_id: int, user_message: str, context_text:
                 agent_tasks = agent_result.get('tasks', [])
                 for task in agent_tasks:
                     if task and task != "...":
-                        all_tasks.append({
-                            'title': task,
-                            'agent': agent_name
-                        })
+                        all_tasks.append({'title': task, 'agent': agent_name})
+
             msg = "".join(msg_parts).strip()
             tasks = all_tasks
 
