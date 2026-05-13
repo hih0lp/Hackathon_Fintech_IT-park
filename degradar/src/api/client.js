@@ -52,6 +52,8 @@ async function refreshAccessToken() {
   return data.access
 }
 
+import { handleApiError } from '../utils/errorHandler.js'
+
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`
   const token = getToken()
@@ -86,22 +88,17 @@ async function apiRequest(endpoint, options = {}) {
   }
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}))
-    // Handle field-specific errors (e.g., {email: ["..."], password: ["..."]})
-    const fieldErrors = Object.entries(error)
-      .filter(([key]) => key !== 'detail' && key !== 'message')
-      .map(([key, messages]) => {
-        if (Array.isArray(messages)) {
-          return `${key}: ${messages.join(', ')}`
-        }
-        return `${key}: ${messages}`
-      })
+    const errorData = await response.json().catch(() => ({}))
+    const error = new Error(errorData.detail || errorData.message || `HTTP ${response.status}`)
+    error.status = response.status
+    error.response = { data: errorData }
+    error.endpoint = endpoint
     
-    if (fieldErrors.length > 0) {
-      throw new Error(fieldErrors.join('; '))
-    }
+    // Handle error with our error handler
+    handleApiError(error, endpoint)
     
-    throw new Error(error.detail || error.message || `HTTP ${response.status}`)
+    // Still throw the error for components that need to handle it
+    throw error
   }
 
   if (response.status === 204) {
@@ -161,8 +158,17 @@ export const projects = {
           Authorization: token ? `Bearer ${token}` : '',
         },
         body: data,
-      }).then(r => {
-        if (!r.ok) throw new Error('Failed to create project')
+      }).then(async (r) => {
+        if (!r.ok) {
+          const errorData = await r.json().catch(() => ({}))
+          const error = new Error(errorData.detail || errorData.message || `HTTP ${r.status}`)
+          error.status = r.status
+          error.response = { data: errorData }
+          error.endpoint = '/projects/'
+          
+          handleApiError(error, '/projects/')
+          throw error
+        }
         return r.json()
       })
     }
@@ -196,8 +202,17 @@ export const projects = {
         Authorization: token ? `Bearer ${token}` : '',
       },
       body: formData,
-    }).then(r => {
-      if (!r.ok) throw new Error('Failed to upload files')
+    }).then(async (r) => {
+      if (!r.ok) {
+        const errorData = await r.json().catch(() => ({}))
+        const error = new Error(errorData.detail || errorData.message || `HTTP ${r.status}`)
+        error.status = r.status
+        error.response = { data: errorData }
+        error.endpoint = `/projects/${projectId}/upload/`
+        
+        handleApiError(error, `/projects/${projectId}/upload/`)
+        throw error
+      }
       return r.json()
     })
   },
@@ -237,6 +252,11 @@ export const chats = {
   getMessageStatus: async (chatId, requestId) => {
     return apiRequest(`/chats/${chatId}/ask/${requestId}/`)
   },
+
+  createNewVersion: (chatId) =>
+    apiRequest(`/chats/chats/${chatId}/new-version/`, {
+      method: 'POST',
+    }),
 }
 
 // Tasks API

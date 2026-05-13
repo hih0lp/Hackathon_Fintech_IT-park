@@ -17,6 +17,7 @@ export default function ProjectPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [newFeatureName, setNewFeatureName] = useState('')
   const [showAgentModal, setShowAgentModal] = useState(false)
+  const [creatingVersionId, setCreatingVersionId] = useState(null)
 
   // Load project and its chats (features)
   useEffect(() => {
@@ -67,6 +68,22 @@ export default function ProjectPage() {
     // Here you can implement what happens when an agent is selected
     // For example, you could open a chat with this agent or navigate to a specific page
     setShowAgentModal(false)
+  }
+
+  const handleCreateNewVersion = async (e, featureId) => {
+    e.stopPropagation()
+    setCreatingVersionId(featureId)
+    
+    try {
+      await chats.createNewVersion(featureId)
+      await loadProjectData() // Обновляем список фич
+    } catch (error) {
+      console.error('Failed to create new version:', error)
+      setError('Не удалось создать новую версию')
+      setTimeout(() => setError(null), 3000)
+    } finally {
+      setCreatingVersionId(null)
+    }
   }
 
   const formatDate = (dateString) => {
@@ -154,10 +171,26 @@ export default function ProjectPage() {
                       {feature.available ? 'Открытый чат' : 'Закрытый чат'}
                     </span>
                   </div>
-                  <div className={styles.featureArrow}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                  <div className={styles.featureActions}>
+                    <button
+                      className={styles.newVersionButton}
+                      onClick={(e) => handleCreateNewVersion(e, feature.id)}
+                      disabled={creatingVersionId === feature.id}
+                      title="Создать новую версию"
+                    >
+                      {creatingVersionId === feature.id ? (
+                        <div className={styles.spinner}></div>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </button>
+                    <div className={styles.featureArrow}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
                   </div>
                 </div>
               ))}

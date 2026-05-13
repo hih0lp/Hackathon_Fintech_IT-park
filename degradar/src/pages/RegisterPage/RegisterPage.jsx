@@ -49,8 +49,11 @@ export default function RegisterPage() {
       localStorage.setItem('pendingEmail', formData.email)
       navigate('/verification')
     } catch (err) {
-      console.error('Registration error:', err)
-      setError(err.message || 'Ошибка регистрации')
+      // Error is now handled by the API client and shown as toast
+      // Only set local error for form validation issues
+      if (!formData.email || !formData.password || !formData.password2) {
+        setError('Заполните все поля')
+      }
     } finally {
       setIsLoading(false)
     }

@@ -168,7 +168,11 @@ export default function ProjectsPage() {
       await loadProjects()
       handleCloseModal()
     } catch (err) {
-      setError(err.message || (editingProjectId ? 'Ошибка редактирования проекта' : 'Ошибка создания проекта'))
+      // Error is now handled by the API client and shown as toast
+      // Only set local error for form validation issues
+      if (!newProject.title.trim()) {
+        setError('Название проекта обязательно для заполнения')
+      }
     }
   }
 

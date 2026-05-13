@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { chats as chatsApi } from '../../../../api/client.js'
 import styles from './FeatureList.module.css'
 
-export default function FeatureList({ features, selectedFeature, onSelectFeature, onDeleteFeature }) {
+export default function FeatureList({ features, selectedFeature, onSelectFeature, onDeleteFeature, onFeatureUpdate }) {
   const [deletingFeatureId, setDeletingFeatureId] = useState(null)
+  const [creatingVersionId, setCreatingVersionId] = useState(null)
 
   const handleDeleteClick = (e, featureId) => {
     e.stopPropagation()
@@ -21,6 +23,22 @@ export default function FeatureList({ features, selectedFeature, onSelectFeature
 
   const handleCancelDelete = () => {
     setDeletingFeatureId(null)
+  }
+
+  const handleCreateNewVersion = async (e, featureId) => {
+    e.stopPropagation()
+    setCreatingVersionId(featureId)
+    
+    try {
+      await chatsApi.createNewVersion(featureId)
+      if (onFeatureUpdate) {
+        onFeatureUpdate()
+      }
+    } catch (error) {
+      console.error('Failed to create new version:', error)
+    } finally {
+      setCreatingVersionId(null)
+    }
   }
 
   return (
@@ -54,6 +72,21 @@ export default function FeatureList({ features, selectedFeature, onSelectFeature
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
+            </button>
+            
+            <button
+              className={styles.newVersionButton}
+              onClick={(e) => handleCreateNewVersion(e, feature.id)}
+              disabled={creatingVersionId === feature.id}
+              title="Создать новую версию"
+            >
+              {creatingVersionId === feature.id ? (
+                <div className={styles.spinner}></div>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 4v16m8-8H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
             </button>
 
             {deletingFeatureId === feature.id && (

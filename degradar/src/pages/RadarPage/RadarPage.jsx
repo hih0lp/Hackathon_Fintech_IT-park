@@ -534,6 +534,30 @@ export default function RadarPage() {
     }
   }
 
+  // Handle feature update (e.g., after creating new version)
+  const handleFeatureUpdate = async () => {
+    if (!currentProject) return
+    
+    try {
+      const response = await chats.list({ project: currentProject.id })
+      const featuresData = response.results || []
+      
+      // Format features for display
+      const formattedFeatures = featuresData.map(feature => ({
+        ...feature,
+        name: feature.name || `Фича ${feature.id}`,
+        date: feature.created_at ? new Date(feature.created_at).toLocaleDateString('ru-RU', { 
+          day: 'numeric', 
+          month: 'short' 
+        }) : 'Сегодня'
+      }))
+      
+      setFeatures(formattedFeatures)
+    } catch (error) {
+      console.error('Failed to update features:', error)
+    }
+  }
+
   return (
     <div className={styles.root}>
       <Header project={currentProject} />
@@ -571,6 +595,7 @@ export default function RadarPage() {
                 selectedFeature={selectedChat}
                 onSelectFeature={handleChatSelection}
                 onDeleteFeature={handleDeleteChat}
+                onFeatureUpdate={handleFeatureUpdate}
               />
               
               {/* Chat panel */}

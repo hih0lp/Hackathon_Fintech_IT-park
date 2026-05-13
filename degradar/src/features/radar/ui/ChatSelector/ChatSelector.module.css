@@ -124,6 +124,65 @@
   opacity: 0.8;
 }
 
+.chatActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.newVersionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.newVersionButton:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  border-color: var(--border-focus);
+  color: var(--text-primary);
+  transform: scale(1.05);
+}
+
+.newVersionButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.chatItem.active .newVersionButton {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-primary);
+  color: var(--text-inverse);
+}
+
+.chatItem.active .newVersionButton:hover:not(:disabled) {
+  background: var(--bg-inverse);
+  color: var(--accent-primary);
+}
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .activeIndicator {
   display: flex;
   align-items: center;
@@ -175,6 +234,16 @@
     width: 20px;
     height: 20px;
   }
+  
+  .newVersionButton {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .spinner {
+    width: 10px;
+    height: 10px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -210,5 +279,15 @@
   .activeIndicator {
     width: 18px;
     height: 18px;
+  }
+  
+  .newVersionButton {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .spinner {
+    width: 9px;
+    height: 9px;
   }
 }

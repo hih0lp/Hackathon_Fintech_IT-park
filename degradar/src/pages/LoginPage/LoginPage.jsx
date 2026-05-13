@@ -47,7 +47,11 @@ export default function LoginPage() {
         setError('Неверный ответ от сервера')
       }
     } catch (err) {
-      setError(err.message || 'Неверный email или пароль')
+      // Error is now handled by the API client and shown as toast
+      // Only set local error for form validation issues
+      if (!formData.email || !formData.password) {
+        setError('Заполните все поля')
+      }
     } finally {
       setIsLoading(false)
     }
