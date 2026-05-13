@@ -67,7 +67,7 @@ def call_llm(llm_request_id: int, chat_id: int, user_message: str, context_text:
 
             response_text = response.text
 
-            pprint.pprint(response_text)
+            # pprint.pprint(response_text)
 
             # Парсим SSE формат
             result = None
@@ -110,6 +110,7 @@ def call_llm(llm_request_id: int, chat_id: int, user_message: str, context_text:
 
             for agent_name, agent_result in agents_data.items():
                 spec = agent_result.get('spec', '')
+                print(f"Processing agent: {agent_name}, spec length: {len(spec)}")
                 if spec and spec != "...":
                     msg_parts.append(f"\n**{agent_name.replace('_', ' ').title()}**:\n")
                     lines = spec.strip().split('\n')
